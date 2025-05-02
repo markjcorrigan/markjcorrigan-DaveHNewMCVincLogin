@@ -1,0 +1,4 @@
+Note that I have .gitignored this class.
+Github is complaining that I have secrets therein.
+I.e. the secret key needed by the framework and also the mailgun passwords etc.
+
