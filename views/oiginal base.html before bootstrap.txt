@@ -1,0 +1,27 @@
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--    <title>{{ title }}</title>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">-->
+<!--</head>-->
+<!--<body>-->
+<!--{% block body %}-->
+
+
+
+<!--{% for message in flash_messages %}-->
+<!--<div class="alert alert-{{ message.type }}">-->
+<!--    {{ message.body }}-->
+<!--</div>-->
+<!--{% endfor %}-->
+
+
+
+
+<!--{% endblock %}-->
+<!--</body>-->
+<!--</html>-->

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block body %}
+
+
+{% if current_user %}
+Hello {{ current_user.name }}.
+
+<a href="/logout">Log out</a>
+
+
+<h1>Logged in</h1>
+<!--<a href="/login/destroy">Logout</a><br>-->
+<p>userObj->id : {{ user.id }}</p>
+<p>userObj->name : {{ user.name }}</p>
+<p>userObj->email : {{ user.email }}</p>
+<p>You have successfully signed in</p>
+
+<a href="/">Take me home</a><br>
+{% else %}
+<h1>Log in</h1>
+<a href="/login">Log in</a> or <a href="/signup">Sign up</a>.<br>
+<a href="/">Take me home</a><br>
+
+{% endif %}
+
+
+
+
+
+
+
+{% endblock %}

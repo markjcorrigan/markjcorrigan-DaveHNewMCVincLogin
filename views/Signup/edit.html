@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block body %}
+<h1>Edit User</h1>
+
+<form method="post" action="/signup/{{ user.id }}/update">
+
+    <div>
+        <label for="inputName">Name</label>
+        <input id="inputName" name="name" placeholder="Name" value="{{ user.name }}" autofocus />
+    </div>
+    {% if errors.name is defined %}
+    <p>{{ errors.name }}</p>
+    {% endif %}
+    <div>
+
+        <label for="inputEmail">Email address</label>
+          <input id="inputEmail" name="email" placeholder="email address" value="{{ user.email }}" />
+
+    </div>
+    {% if errors.email is defined %}
+    <p>{{ errors.email }}</p>
+    {% endif %}
+
+    <div>
+        <label for="new_password">New Password</label>
+        <input type="password" id="new_password" name="new_password" placeholder="New Password" />
+
+    </div>
+    {% if errors.password is defined %}
+    <p>{{ errors.password }}</p>
+    {% endif %}
+    <div>
+        <label for="confirm_new_password">Confirm New Password</label>
+        <input type="password" id="confirm_new_password" name="confirm_new_password" placeholder="Confirm New Password" />
+    </div>
+    <button type="submit">Update</button>
+</form>
+<p><a href="/signup/{{ user.id }}/show">Cancel</a></p>
+{% endblock %}
+
+
