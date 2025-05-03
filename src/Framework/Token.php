@@ -56,6 +56,7 @@ class Token
      */
     public function getHash(): string
     {
-        return hash_hmac('sha256', $this->token, Config::SECRET_KEY);  // sha256 = 64 chars
+ //       return hash_hmac('sha256', $this->token, Config::SECRET_KEY);  // sha256 = 64 chars
+        return hash_hmac('sha256', $this->token, $_ENV["SECRET_KEY"]);  // sha256 = 64 chars
     }
 }

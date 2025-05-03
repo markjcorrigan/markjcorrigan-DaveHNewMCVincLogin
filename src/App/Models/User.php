@@ -31,8 +31,6 @@ class User extends Model
     public string $password;
     public string $password_hash;
     public ?string $password_reset_hash;
-
-
     public string $password_reset_token;
 
     public ?string $password_reset_expires_at;
@@ -40,23 +38,26 @@ class User extends Model
     public ?string $activation_hash;
 
     public int $is_active;
+
     public int $is_access;
+
     public int $is_admin;
+
     public string $memstart;
+
     public string $memfin;
+
     public ?string $activation_token;
 
     public ?string $remember_token;
-    public ?int $expiry_timestamp;
 
+    public ?int $expiry_timestamp;
 
 
 //    protected ?string $password_reset_token;
 
 
-
     public array $errors = [];
-
 
 
 //    public function __construct(Database $database, protected View $view) {
@@ -64,12 +65,10 @@ class User extends Model
 //
 //    }
 
-    public function __construct(Database $database, protected readonly MVCTemplateViewer $view) {
+    public function __construct(Database $database, protected readonly MVCTemplateViewer $view)
+    {
         parent::__construct($database);
     }
-
-
-
 
 
     public function clearErrors(): void
@@ -78,7 +77,8 @@ class User extends Model
     }
 
 
-    public function userCreateVal(array $data, ?string $id = null): void {
+    public function userCreateVal(array $data, ?string $id = null): void
+    {
 
         $this->clearErrors(); // Clear any existing errors
 
@@ -95,7 +95,7 @@ class User extends Model
             $this->addError("email", "Email is required");
         } elseif (filter_var($data["email"], FILTER_VALIDATE_EMAIL) === false) {
             $this->addError('email', 'Invalid email');
-        }     elseif ($this->emailExists($data["email"], $data["id"] ?? null)) {
+        } elseif ($this->emailExists($data["email"], $data["id"] ?? null)) {
             $this->addError('email', 'email already taken');
         }
 
@@ -115,7 +115,8 @@ class User extends Model
         }
     }
 
-    public function userUpdateVal(array $data, ?string $id): void {
+    public function userUpdateVal(array $data, ?string $id): void
+    {
         $this->clearErrors(); // Clear any existing errors
         // Use the validation logic from validateUser
         // Name
@@ -144,15 +145,6 @@ class User extends Model
     }
 
 
-
-
-
-
-
-
-
-
-
     public function emailExistsUpdate($email, $id = null): bool //NB the custom validateUpdate check above uses this custome emailEsistsUpdate method to enable me to save same email to database while updating other fields
     {
         $user = static::findByEmail($email);
@@ -169,8 +161,6 @@ class User extends Model
     }
 
 
-
-
     public function getTotal(): int
     {
         $sql = "SELECT COUNT(*) AS total
@@ -185,14 +175,8 @@ class User extends Model
         return (int)$row["total"];
     }
 
-    /**
-     * See if a user record already exists with the specified email
-     *
-     * @param string $email email address to search for
-     *
-     * @return boolean  True if a record already exists with the specified email, false otherwise
-     */
-    public function emailExists(string $email, $id = null): bool {
+    public function emailExists(string $email, $id = null): bool
+    {
         $sql = 'SELECT * FROM user WHERE email = :email';
         if ($id !== null) {
             $sql .= ' AND id != :id';
@@ -205,6 +189,33 @@ class User extends Model
         }
         $stmt->execute();
         return $stmt->fetch() !== false;
+    }
+
+
+    public function findByEmail($email, $id = null): ?User
+    {
+        $sql = 'SELECT * FROM user WHERE email = :email';
+        if ($id !== null) {
+            $sql .= ' AND id != :id';
+        }
+        $conn = $this->database->getConnection();
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        if ($id !== null) {
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        $userData = $stmt->fetch();
+        if ($userData) {
+            $user = new User($this->database, $this->view);
+
+            foreach ($userData as $key => $value) {
+                $user->$key = $value;
+            }
+            return $user;
+        }
+        return null; // You might want to return null if no user is found
     }
 
 
@@ -268,15 +279,7 @@ class User extends Model
         return $stmt->execute();
     }
 
-//    protected function sendPasswordResetEmail()
-//    {
-//        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->password_reset_token;
-//
-//        $text = View::getTemplate('Password/reset_email.txt', ['url' => $url]);
-//        $html = View::getTemplate('Password/reset_email.html', ['url' => $url]);
-//
-//        Mail::send($this->email, 'Password reset', $text, $html);
-//    }
+
     protected function sendPasswordResetEmail(): Response
     {
         ///  $url = 'https://' . $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->password_reset_token;  /////backed up while hosting locally
@@ -288,14 +291,14 @@ class User extends Model
 
         $text = $this->view->render('Password/reset_email.txt', ['url' => $url]);
 
-        $html  = $this->view->render('Password/reset_email.html', ['url' => $url]);
-
+        $html = $this->view->render('Password/reset_email.html', ['url' => $url]);
 
 
         Mail::send($this->email, 'Password reset', $text, $html);
         return new Response(); // or return a specific response object
 
     }
+
     public function findByPasswordReset($token)
     {
         $token = new Token($token);
@@ -319,100 +322,6 @@ class User extends Model
     }
 
 
-//    public  function findByPasswordReset($token)
-//    {
-//        $token = new Token($token);
-//        $hashed_token = $token->getHash();
-//
-//        // $sql = 'SELECT * FROM users
-//        //         WHERE password_reset_token = :token';
-//
-//        $sql = 'SELECT * FROM user
-//                WHERE password_reset_hash = :token_hash';
-//
-//
-//        $conn = $this->database->getConnection();
-//        $stmt = $conn->prepare($sql);
-//        $stmt->bindValue(':token_hash', $hashed_token, PDO::PARAM_STR);
-//
-//        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
-//
-//        $stmt->execute();
-//
-//        $user = $stmt->fetch();
-//
-//        if ($user) {
-//
-//            // Check password reset token hasn't expired
-//            if (strtotime($user->password_reset_expires_at) > time()) {
-//
-//                return $user;
-//            }
-//        }
-//
-//    }
-
-//    public function findByPasswordReset($token)
-//    {
-//        $token = new Token($token);
-//        $hashed_token = $token->getHash();
-//
-//        // $sql = 'SELECT * FROM users
-//        //         WHERE password_reset_token = :token';
-//
-//        $sql = 'SELECT * FROM user
-//                WHERE password_reset_token = :token';
-//
-//        $conn = $this->database->getConnection();
-//        $stmt = $conn->prepare($sql);
-//
-//        $stmt->bindValue(':token_hash', $hashed_token, PDO::PARAM_STR);
-//
-//        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
-//
-//        $stmt->execute();
-//
-//        $user = $stmt->fetch();
-//
-//        if ($user) {
-//
-//            // Check password reset token hasn't expired
-//            if (strtotime($user->password_reset_expires_at) > time()) {
-//
-//                return $user;
-//            }
-//        }
-//
-//    }
-
-
-    public function findByEmail($email, $id = null): ?User
-    {
-        $sql = 'SELECT * FROM user WHERE email = :email';
-        if ($id !== null) {
-            $sql .= ' AND id != :id';
-        }
-        $conn = $this->database->getConnection();
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-        if ($id !== null) {
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        }
-        $stmt->execute();
-        $stmt->setFetchMode(PDO::FETCH_ASSOC);
-        $userData = $stmt->fetch();
-        if ($userData) {
-            $user = new User($this->database, $this->view);
-
-            foreach ($userData as $key => $value) {
-                $user->$key = $value;
-            }
-            return $user;
-        }
-        return null; // You might want to return null if no user is found
-    }
-
-
     public function authenticate(string $email, string $password): mixed
     {
         $user = $this->findByEmail($email);
@@ -429,9 +338,8 @@ class User extends Model
     }
 
 
-
-
-    public function findByID(string $id): ?User {
+    public function findByID(string $id): ?User
+    {
         $sql = 'SELECT * FROM user WHERE id = :id';
         $conn = $this->database->getConnection();
         $stmt = $conn->prepare($sql);
@@ -448,9 +356,8 @@ class User extends Model
     }
 
 
-
-
-    public function findByUserID(string $id): mixed {
+    public function findByUserID(string $id): mixed
+    {
         $sql = 'SELECT * FROM user WHERE id = :id';
         $conn = $this->database->getConnection();
         $stmt = $conn->prepare($sql);
@@ -461,31 +368,18 @@ class User extends Model
     }
 
 
-
-
-
-
-
-
-
     public function sendActivationEmail(): Response
     {
-
-
-    $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_hash; /////backed up while hosting locally
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_hash; /////backed up while hosting locally
 //        $url = 'https://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_token;
 
-
         $text = $this->view->render('Signup/activation_email.txt', ['url' => $url]);
-        $html  = $this->view->render('Signup/activation_email.html', ['url' => $url]);
+        $html = $this->view->render('Signup/activation_email.html', ['url' => $url]);
 
         Mail::send($this->email, 'Account activation', $text, $html);
 
         return new Response(); // or return a specific response object
     }
-
-
-
 
 
     //public function resetPassword($data)
@@ -508,9 +402,6 @@ class User extends Model
     }
 
 
-
-
-
     protected function validatePassword(array $data): void
     {
         if (strlen($data['password']) < 6) {
@@ -523,18 +414,11 @@ class User extends Model
     }
 
 
-    /**
-     * Clear the password reset token and expiry from the model
-     *
-     * @return void
-     */
     public function clearPasswordReset(): void
     {
         $sql = 'UPDATE user
                 SET password_reset_token = NULL, password_reset_expires_at = NULL
                 WHERE id = :id';
-
-
 
         $conn = $this->database->getConnection();
         $stmt = $conn->prepare($sql);
@@ -576,13 +460,6 @@ class User extends Model
     }
 
 
-    /**
-     * Update the user's profile
-     *
-     * @param array $data Data from the edit profile form
-     *
-     * @return boolean  True if the data was updated, false otherwise
-     */
     public function updateProfile(array $data): bool
     {
         $this->name = $data['name'];
@@ -608,8 +485,6 @@ class User extends Model
             $sql .= "\nWHERE id = :id";
             //$sql .= "WHERE id = :id";
 
-
-
             $conn = $this->database->getConnection();
             $stmt = $conn->prepare($sql);
 
@@ -632,12 +507,11 @@ class User extends Model
     }
 
 
-
     public function paginate(string $page): array
     {
         $conn = $this->database->getConnection();
 
-        $total_records = (int) $conn->query('SELECT COUNT(id) FROM users')->fetchColumn();
+        $total_records = (int)$conn->query('SELECT COUNT(id) FROM users')->fetchColumn();
 
         $records_per_page = 5;
 
@@ -661,14 +535,7 @@ class User extends Model
         return [$result, $paginator->getPage(), $paginator->getTotalPages()];
     }
 
-    /**
-     * Update the user record
-     *
-     *
-     * @param string $id
-     * @param array $data
-     * @return boolean  True if the data was updated, false otherwise
-     */
+
     public function update(string $id, array $data): bool
     {
         $this->firstname = $data['firstname'];

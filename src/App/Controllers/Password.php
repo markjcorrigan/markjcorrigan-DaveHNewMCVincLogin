@@ -35,17 +35,6 @@ class Password extends Controller
         return new Response($content);
     }
 
-//    public function reset(string $token): Response
-//    {
-//        $result = $this->getUserOrExit($token);
-//        if (isset($result['error'])) {
-//            return $result['error'];
-//        }
-//        $content = $this->view->renderTemplate('Password/reset.html', [
-//            'token' => $token
-//        ]);
-//        return new Response($content);
-//    }
     public function reset(string $token): Response
     {
         $result = $this->getUserOrExit($token);
@@ -59,30 +48,6 @@ class Password extends Controller
         }
     }
 
-    /**
-     * Reset the user's password
-     *
-     * @return Response
-     */
-//    public function resetPassword(): Response
-//    {
-//        $token = $_POST['token'];
-//        $result = $this->getUserOrExit($token);
-//        if (isset($result['error'])) {
-//            return $result['error'];
-//        }
-//        $user = $result;
-//        if ($user->resetPassword($_POST['password'])) {
-//            $content = $this->view->renderTemplate('Password/reset_success.html');
-//            return new Response($content);
-//        } else {
-//            $content = $this->view->renderTemplate('Password/reset.html', [
-//                'token' => $token,
-//                'user' => $user
-//            ]);
-//            return new Response($content);
-//        }
-//    }
 
     public function resetPassword(): Response
     {
