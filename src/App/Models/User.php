@@ -370,7 +370,9 @@ class User extends Model
 
     public function sendActivationEmail(): Response
     {
-        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_hash; /////backed up while hosting locally
+
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_token; /////I believe this is token not hash!!!
+//        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_hash; /////backed up while hosting locally
 //        $url = 'https://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_token;
 
         $text = $this->view->render('Signup/activation_email.txt', ['url' => $url]);
@@ -600,19 +602,14 @@ class User extends Model
      * @param string $id
      * @return void
      */
-    public function delete(string $id): bool
-    {
-        $sql = 'DELETE FROM user
-                WHERE id = :id';
-
+    public function delete(string $id): bool {
+        $sql = 'DELETE FROM user WHERE id = :id';
         $conn = $this->database->getConnection();
         $stmt = $conn->prepare($sql);
-
-        $stmt->bindValue(':id', $this->id, PDO::PARAM_STR);
-
-        $stmt->execute();
-
-
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
     }
+
+
 
 }

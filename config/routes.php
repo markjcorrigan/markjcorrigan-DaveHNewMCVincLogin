@@ -34,4 +34,12 @@ $router->add("/products", ["controller" => "products", "action" => "index"]);
 $router->add("/", ["controller" => "home", "action" => "index"]);
 $router->add("/{controller}/{action}");
 
+///testing
+$router->add('addsign', ['controller' => 'addsign', 'action' => 'new']);
+//$router->add('addsign/activate/{token:[\da-f]+}', ['controller' => 'addsign', 'action' => 'activate']);
+$router->add('addsign/activate/{token:[\da-f]+}', ['controller' => 'addsign', 'action' => 'activate', 'token' => 'token']);
+
+
+
+
 return $router;
