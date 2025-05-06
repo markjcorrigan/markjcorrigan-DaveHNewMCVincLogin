@@ -23,7 +23,7 @@ $router->add('password/reset/{token:[\da-f]+}', ['controller' => 'Password', 'ac
 
 
 $router->add('signup/activate/{token:[\da-f]+}', ['controller' => 'Signup', 'action' => 'activate']);
-//$router->add('items/index', ['controller' => 'items', 'action' => 'index', "middleware" => "deny"]);
+$router->add('items/index', ['controller' => 'items', 'action' => 'index', "middleware" => "deny"]);
 $router->add('items/{action:.*}', ['controller' => 'items', "middleware" => "deny"]);
 
 
@@ -35,9 +35,9 @@ $router->add("/", ["controller" => "home", "action" => "index"]);
 $router->add("/{controller}/{action}");
 
 ///testing
-$router->add('addsign', ['controller' => 'addsign', 'action' => 'new']);
-//$router->add('addsign/activate/{token:[\da-f]+}', ['controller' => 'addsign', 'action' => 'activate']);
-$router->add('addsign/activate/{token:[\da-f]+}', ['controller' => 'addsign', 'action' => 'activate', 'token' => 'token']);
+//$router->add('signup', ['controller' => 'signup', 'action' => 'new']);
+//
+//$router->add('signup/activate/{token:[\da-f]+}', ['controller' => 'signup', 'action' => 'activate', 'token' => 'token']);
 
 
 

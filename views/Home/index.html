@@ -11,11 +11,17 @@ Hello {{ current_user.name }}.
 
 <a href="/logout">Log out</a>
 
+<br>
+<br>
+<a href="signup/new">New Test User</a><br>
+<a href="/signup/index">User Management</a>
+
     {% else %}
 <h1>Home page</h1>
 <br>
 <br>
-<a href="addsign/new">New Test User</a>
+<a href="signup/new">New Test User</a><br>
+<a href="/signup/index">User Management</a>
     {% endif %}
 
 {% endblock %}

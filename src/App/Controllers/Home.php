@@ -24,7 +24,6 @@ class Home extends Controller {
 //        Mail::send('markjc@mweb.co.za', 'Test Message', 'This is a test', '<h1>This is a test</h1>');
 
         $content = $this->view->renderTemplate("Home/index.html", [
-
             "title" => "Home"
         ]);
         return new Response($content);

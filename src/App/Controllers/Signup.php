@@ -2,12 +2,15 @@
 
 namespace App\Controllers;
 
+use App\Database;
 use Framework\Controller;
 use Framework\Exceptions\PageNotFoundException;
-use Framework\Flash;
+use Framework\Mail;
+use Framework\MVCTemplateViewer;
 use Framework\Response;
 use Framework\View;
 use \App\Models\User;
+use PDO;
 
 /**
  * Signup controller
@@ -16,7 +19,7 @@ use \App\Models\User;
  */
 class Signup extends Controller
 {
-    public function __construct(protected readonly View $view, private readonly User $model)
+    public function __construct(protected readonly Database $database, private readonly User $model, protected readonly View $view) //I need to select either $user or $model.  Went with $model Also View and MVCTemplateViewer
     {
     }
 
@@ -37,45 +40,63 @@ class Signup extends Controller
         return new Response($content);
     }
 
-
     public function create(): Response {
-        $validationData = [
-            "name" => $this->request->post["name"],
-            "email" => $this->request->post["email"],
-            "password" => $this->request->post["password"],
-            "password_confirmation" => $this->request->post["password_confirmation"],
-        ];
-
-        $this->model->clearErrors();
-
-        $this->model->userCreateVal($validationData);
-
-        if (empty($this->model->getErrors())) {
-            $insertData = [
-                "name" => $validationData["name"],
-                "email" => $validationData["email"],
-                "password_hash" => password_hash($validationData["password"], PASSWORD_DEFAULT),
-
-            ];
-
-            if ($this->model->insert($insertData)) {
-                Flash::addMessage('User created successfully');
-                return $this->redirect("/signup/{$this->model->getInsertID()}/show");
+        if (!empty($_POST["firstname"])) {
+            $this->redirect('/signup/success');
+        } else {
+            $user = new User($this->database, new MVCTemplateViewer());
+            $user->setData($_POST);
+            if ($user->save()) {
+                $_SESSION['activation_hash'] = $user->activation_hash;
+                return $this->redirect('/signup/success');
+            } else {
+                $content = $this->view->renderTemplate('Signup/new.html', [
+                    'user' => $user,
+                    'errors' => $user->errors
+                ]);
+                return new Response($content);
             }
         }
-
-        $content = $this->view->renderTemplate('Signup/new.html', [
-            "errors" => $this->model->getErrors(),
-            "user" => [
-                "name" => $validationData["name"],
-                "email" => $validationData["email"],
-                "password" => $validationData["password"],
-                "password_confirmation" => $validationData["password_confirmation"],
-            ]
-        ]);
-
-        return new Response($content);
     }
+
+//    public function create(): Response {  //Previous create method before one above
+//        $validationData = [
+//            "name" => $this->request->post["name"],
+//            "email" => $this->request->post["email"],
+//            "password" => $this->request->post["password"],
+//            "password_confirmation" => $this->request->post["password_confirmation"],
+//        ];
+//
+//        $this->model->clearErrors();
+//
+//        $this->model->userCreateVal($validationData);
+//
+//        if (empty($this->model->getErrors())) {
+//            $insertData = [
+//                "name" => $validationData["name"],
+//                "email" => $validationData["email"],
+//                "password_hash" => password_hash($validationData["password"], PASSWORD_DEFAULT),
+//
+//            ];
+//
+//            if ($this->model->insert($insertData)) {
+//                Flash::addMessage('User created successfully');
+//                return $this->redirect("/signup/{$this->model->getInsertID()}/show");
+//            }
+//        }
+//
+//        $content = $this->view->renderTemplate('Signup/new.html', [
+//            "errors" => $this->model->getErrors(),
+//            "user" => [
+//                "name" => $validationData["name"],
+//                "email" => $validationData["email"],
+//                "password" => $validationData["password"],
+//                "password_confirmation" => $validationData["password_confirmation"],
+//            ]
+//        ]);
+//
+//        return new Response($content);
+//    }
 
 
     //////////////////////////work on below
@@ -133,53 +154,60 @@ class Signup extends Controller
     }
 
 
+    public function success(): Response {
+        if (isset($_SESSION['activation_hash'])) {
+            $user = $this->findByActivationHash($_SESSION['activation_hash']);
+
+            if ($user instanceof User) {
+                $user->sendActivationEmail();
+            }
+            unset($_SESSION['activation_hash']);
+            $content = $this->view->renderTemplate('Signup/success.html');
+            return new Response($content);
+        }
+    }
+
+    public function findByActivationHash($activation_hash): ?User {
+        $conn = $this->database->getConnection();
+        $stmt = $conn->prepare('SELECT * FROM user WHERE activation_hash = :activation_hash');
+        $stmt->bindParam(':activation_hash', $activation_hash);
+        $stmt->execute();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($data) {
+            $user = new User($this->database, new MVCTemplateViewer());
+
+            foreach ($data as $key => $value) {
+                if (property_exists($user, $key)) {
+                    $user->$key = $value;
+                }
+            }
+            return $user;
+        }
+        return null;
+    }
 
 
+    public function activate(): Response {
+        $uri = $_SERVER['REQUEST_URI'];
+        $parts = explode('/', $uri);
+        $token = end($parts);
+        $this->model->activate($token);
+        Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
+        return $this->redirect('/signup/activated');
+    }
 
 
+    /**
+     * Show the activation success page
+     *
+     * @return void
+     */
+    public function activated(): Response
+    {
+        $content = $this->view->renderTemplate('Signup/activated.html');
+        return new Response($content);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    public function create(): Response
-//    {
-//        $password_hash = password_hash($this->request->post["password"], PASSWORD_DEFAULT);
-//
-//        $data = [
-//            "name" => $this->request->post["name"],
-//            "email" => $this->request->post["email"],
-//            "password" => $this->request->post["password"],
-//            "password_confirmation" => $this->request->post["password_confirmation"],
-//            'password_hash' =>  $password_hash
-//        ];
-//
-//
-//        if ($this->model->insert($data)) {
-//
-//
-//            return $this->redirect("/signup/{$this->model->getInsertID()}/show");
-//
-//        } else {
-//            $content = $this->view->renderTemplate('Signup/new.html', [
-//                "errors" => $this->model->getErrors(),
-//                "user" => $data
-//            ]);
-//            return new Response($content);
-//
-//
-//        }
-//    }
-
+    }
 
 
 
@@ -233,62 +261,4 @@ class Signup extends Controller
 
 
 
-
-
-
-    /**
-     * Sign up a new user
-     *
-     * @return void
-     */
-//    public function createAction()
-//    {
-//        $user = new User($_POST);
-//
-//        if ($user->save()) {
-//
-//            $user->sendActivationEmail();
-//
-//            $this->redirect('/signup/success');
-//
-//        } else {
-//
-//            View::renderTemplate('Signup/new.html', [
-//                'user' => $user
-//            ]);
-//
-//        }
-//    }
-//
-//    /**
-//     * Show the signup success page
-//     *
-//     * @return void
-//     */
-//    public function successAction()
-//    {
-//        View::renderTemplate('Signup/success.html');
-//    }
-//
-//    /**
-//     * Activate a new account
-//     *
-//     * @return void
-//     */
-//    public function activateAction()
-//    {
-//        User::activate($this->route_params['token']);
-//
-//        $this->redirect('/signup/activated');
-//    }
-//
-//    /**
-//     * Show the activation success page
-//     *
-//     * @return void
-//     */
-//    public function activatedAction()
-//    {
-//        View::renderTemplate('Signup/activated.html');
-//    }
 }
