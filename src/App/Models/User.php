@@ -3,19 +3,15 @@
 namespace App\Models;
 
 use App\Database;
-use App\Controllers;
-use DateTime;
-use Framework\Auth;
-use Framework\Flash;
+
 use Framework\Model;
 use Framework\MVCTemplateViewer;
 use Framework\Paginator;
 use Framework\Response;
-use PDO;
 use Framework\Token;
 use Framework\Mail;
-use Framework\View;
-use PDOException;
+use PDO;
+
 
 /**
  * User model
@@ -207,8 +203,6 @@ class User extends Model
     }
 
 
-
-
     public function emailExists(string $email, $id = null): bool
     {
         $sql = 'SELECT * FROM user WHERE email = :email';
@@ -225,20 +219,6 @@ class User extends Model
         return $stmt->fetch() !== false;
     }
 
-    //    public function emailExistsUpdate($email, $id = null): bool //NB the custom validateUpdate check above uses this custome emailEsistsUpdate method to enable me to save same email to database while updating other fields
-//    {
-//        $user = static::findByEmail($email);
-//
-//        if ($user) {
-//            if ($user->id == $id) {
-//                return false; // Email belongs to the same user
-//            } else {
-//                return true; // Email belongs to a different user
-//            }
-//        }
-//
-//        return false; // Email doesn't exist
-//    }
 
     public function save(): bool
     {
@@ -314,26 +294,6 @@ class User extends Model
         $html = $this->view->render('Signup/activation_email.html', ['url' => $url]);
         Mail::send($this->email, 'Account activation', $text, $html);
     }
-
-
-
-
-//
-//    public function emailExists(string $email, $id = null): bool
-//    {
-//        $sql = 'SELECT * FROM user WHERE email = :email';
-//        if ($id !== null) {
-//            $sql .= ' AND id != :id';
-//        }
-//        $conn = $this->database->getConnection();
-//        $stmt = $conn->prepare($sql);
-//        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-//        if ($id !== null) {
-//            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-//        }
-//        $stmt->execute();
-//        return $stmt->fetch() !== false;
-//    }
 
 
     public function findByEmail($email, $id = null): ?User
@@ -512,24 +472,6 @@ class User extends Model
     }
 
 
-//    public function sendActivationEmail(): Response
-//    {
-//
-//        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_token; /////I believe this is token not hash!!!
-////        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_hash; /////backed up while hosting locally
-////        $url = 'https://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_token;
-//
-//        $text = $this->view->render('Signup/activation_email.txt', ['url' => $url]);
-//        $html = $this->view->render('Signup/activation_email.html', ['url' => $url]);
-//
-//        Mail::send($this->email, 'Account activation', $text, $html);
-//
-//        return new Response(); // or return a specific response object
-//    }
-
-
-    //public function resetPassword($data)
-
     public function resetPassword($password): bool
     {
         $this->password = $password;
@@ -583,72 +525,6 @@ class User extends Model
         $stmt->bindParam(':token', $token);
         return $stmt->execute();
     }
-
-
-
-
-//    public  function activate($value): void
-//    {
-//        $token = new Token();
-//        $hashed_token = $token->getHash();
-//
-//        $sql = 'UPDATE user
-//                SET is_active = 1,
-//                    activation_hash = null
-//                WHERE activation_hash = :hashed_token';
-//
-//
-//        $conn = $this->database->getConnection();
-//        $stmt = $conn->prepare($sql);
-//
-//        $stmt->bindValue(':hashed_token', $hashed_token, PDO::PARAM_STR);
-//
-//        $stmt->execute();
-//    }
-//        $this->activation_token = $token->getValue();
-
-//        $sql = 'SELECT activation_hash FROM user WHERE activation_hash = :hashed_token';
-//        $conn = $this->database->getConnection();
-//        $stmt = $conn->prepare($sql);
-//        $stmt->bindParam(':hashed_token', $hashed_token, PDO::PARAM_STR);
-//        $stmt->execute();
-//        $result = $stmt->fetch();
-//
-//        if ($result) {
-//            Flash::addMessage('Debug if hash is found', Flash::WARNING);
-//        } else {
-//            Flash::addMessage('Debug if hash is not found', Flash::WARNING);
-//        }
-//
-//        $sql = 'UPDATE user SET is_active = 1, is_access = 1, activation_hash = null WHERE activation_hash = :hashed_token';
-//        $stmt = $conn->prepare($sql);
-//        $stmt->bindParam(':hashed_token', $hashed_token, PDO::PARAM_STR);
-//        $stmt->execute();
-//        var_dump($stmt->rowCount()); // Debug the number of rows affected
-//        $stmt->execute();
-//    }
-
-
-
-
-//    public function activate(string $value): void
-//    {
-//        $token = new Token($value);
-//        $hashed_token = $token->getHash();
-//
-//        $sql = 'UPDATE user
-//                SET is_active = 1,
-//               is_access = 1,
-//                    activation_hash = null
-//                WHERE activation_hash = :hashed_token';
-//
-//
-//        $conn = $this->database->getConnection();
-//        $stmt = $conn->prepare($sql);
-//        $stmt->bindParam(':hashed_token', $hashed_token, PDO::PARAM_STR);
-//
-//        $stmt->execute();
-//    }
 
 
     public function updateProfile(array $data): bool
@@ -727,165 +603,84 @@ class User extends Model
     }
 
 
-public function update(string $id, array $data): bool {
-    $this->id = $id;
-    $this->name = $data['name'];
-    $this->email = $data['email'];
-    $this->is_access = $data['is_access'] ?? false;
-    $this->is_active = $data['is_active'] ?? false;
-    $this->is_admin = $data['is_admin'] ?? false;
-    $this->memstart = $data['memstart'] ?? false;
-    $this->memfin = $data['memfin'] ?? false;
+    public function update(string $id, array $data): bool {
+        $this->id = $id;
+        $this->name = $data['name'];
+        $this->email = $data['email'];
+        $this->is_access = $data['is_access'] ?? false;
+        $this->is_active = $data['is_active'] ?? false;
+        $this->is_admin = $data['is_admin'] ?? false;
+        $this->memstart = $data['memstart'] ?? false;
+        $this->memfin = $data['memfin'] ?? false;
 
-    // Check if firstname is set, if so, it's likely a bot
-if (isset($data['firstname']) && $data['firstname'] != '') {
-    // You can log this or take other action if you want
-    // For now, just return false
-return false;
-}
-
-// Only validate and update the password if a value provided
-if (isset($data['password']) && $data['password'] != '') {
-    $this->password = $data['password'];
-
-    // Password validation
-    if (strlen($this->password) < 6) {
-        $this->addError('password', 'Please enter at least 6 characters for the password');
-    } elseif (preg_match('/.*[a-z]+.*/i', $this->password) == 0) {
-        $this->addError('password', 'Password needs at least one letter');
-    } elseif (preg_match('/.*\d+.*/i', $this->password) == 0) {
-        $this->addError('password', 'Password needs at least one number');
-    } elseif (!isset($data["password_confirmation"]) || $this->password != $data["password_confirmation"]) {
-        $this->addError('password', 'Password must match confirmation');
-    }
-}
-
-// Name validation
-if (!preg_match('/^[A-Za-z0-9\x{00C0}-\x{00FF}]+ ?[A-Za-z0-9\x{00C0}-\x{00FF}]+$/u', $this->name)) {
-    $this->addError('name', 'Please enter ONE (or max TWO [AlphaNumeric]) user names');
-}
-
-// Email validation
-if (empty($this->email)) {
-    $this->addError("email", "Email is required");
-} elseif (filter_var($this->email, FILTER_VALIDATE_EMAIL) === false) {
-    $this->addError('email', 'Invalid email');
-} elseif ($this->emailExists($this->email, $id)) {
-    $this->addError('email', 'email already taken');
-}
-
-if (empty($this->errors)) {
-    $sql = 'UPDATE user SET name = :name, email = :email, is_active = :is_active, is_access = :is_access, is_admin = :is_admin, memstart = :memstart, memfin = :memfin';
-
-    // Add password if it's set
-    if (isset($this->password)) {
-        $sql .= ', password_hash = :password_hash';
-    }
-    $sql .= "\nWHERE id = :id";
-
-    $conn = $this->database->getConnection();
-    $stmt = $conn->prepare($sql);
-    $stmt->bindValue(':id', $this->id, PDO::PARAM_STR);
-    $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
-    $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
-    $stmt->bindValue(':is_active', $this->is_active, PDO::PARAM_BOOL);
-    $stmt->bindValue(':is_access', $this->is_access, PDO::PARAM_BOOL);
-    $stmt->bindValue(':is_admin', $this->is_admin, PDO::PARAM_BOOL);
-    $stmt->bindValue(':memstart', $this->memstart, PDO::PARAM_STR);
-    $stmt->bindValue(':memfin', $this->memfin, PDO::PARAM_STR);
-
-    // Add password if it's set
-    if (isset($this->password)) {
-        $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
-        $stmt->bindParam(':password_hash', $password_hash, PDO::PARAM_STR);
+        // Check if firstname is set, if so, it's likely a bot
+    if (isset($data['firstname']) && $data['firstname'] != '') {
+        // You can log this or take other action if you want
+        // For now, just return false
+    return false;
     }
 
-    return $stmt->execute();
-}
+    // Only validate and update the password if a value provided
+    if (isset($data['password']) && $data['password'] != '') {
+        $this->password = $data['password'];
 
-return false;
-}
+        // Password validation
+        if (strlen($this->password) < 6) {
+            $this->addError('password', 'Please enter at least 6 characters for the password');
+        } elseif (preg_match('/.*[a-z]+.*/i', $this->password) == 0) {
+            $this->addError('password', 'Password needs at least one letter');
+        } elseif (preg_match('/.*\d+.*/i', $this->password) == 0) {
+            $this->addError('password', 'Password needs at least one number');
+        } elseif (!isset($data["password_confirmation"]) || $this->password != $data["password_confirmation"]) {
+            $this->addError('password', 'Password must match confirmation');
+        }
+    }
 
+    // Name validation
+    if (!preg_match('/^[A-Za-z0-9\x{00C0}-\x{00FF}]+ ?[A-Za-z0-9\x{00C0}-\x{00FF}]+$/u', $this->name)) {
+        $this->addError('name', 'Please enter ONE (or max TWO [AlphaNumeric]) user names');
+    }
 
+    // Email validation
+    if (empty($this->email)) {
+        $this->addError("email", "Email is required");
+    } elseif (filter_var($this->email, FILTER_VALIDATE_EMAIL) === false) {
+        $this->addError('email', 'Invalid email');
+    } elseif ($this->emailExists($this->email, $id)) {
+        $this->addError('email', 'email already taken');
+    }
 
+    if (empty($this->errors)) {
+        $sql = 'UPDATE user SET name = :name, email = :email, is_active = :is_active, is_access = :is_access, is_admin = :is_admin, memstart = :memstart, memfin = :memfin';
 
+        // Add password if it's set
+        if (isset($this->password)) {
+            $sql .= ', password_hash = :password_hash';
+        }
+        $sql .= "\nWHERE id = :id";
 
+        $conn = $this->database->getConnection();
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':id', $this->id, PDO::PARAM_STR);
+        $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
+        $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
+        $stmt->bindValue(':is_active', $this->is_active, PDO::PARAM_BOOL);
+        $stmt->bindValue(':is_access', $this->is_access, PDO::PARAM_BOOL);
+        $stmt->bindValue(':is_admin', $this->is_admin, PDO::PARAM_BOOL);
+        $stmt->bindValue(':memstart', $this->memstart, PDO::PARAM_STR);
+        $stmt->bindValue(':memfin', $this->memfin, PDO::PARAM_STR);
 
-//    public function update(string $id, array $data): bool
-//    {
-//        $this->firstname = $data['firstname'];
-//        $this->name = $data['name'];
-//        $this->email = $data['email'];
-//        $this->is_access = $data['is_access'] ?? false;
-//        $this->is_active = $data['is_active'] ?? false;
-//        $this->is_admin = $data['is_admin'] ?? false;
-//        $this->memstart = $data['memstart'] ?? false;
-//        $this->memfin = $data['memfin'] ?? false;
-//
-//        // Only validate and update the password if a value provided
-//        if ($data['password'] != '') {
-//            $this->password = $data['password'];
-//        }
-//
-//        $this->validate();
-//
-//        if (empty($this->errors)) {
-//
-//            $sql = 'UPDATE user
-//                    SET firstname = :firstname, name = :name, email = :email, is_active = :is_active, is_access = :is_access, is_admin = :is_admin, memstart = :memstart, memfin = :memfin';
-//
-//            // Add password if it's set
-//            if (isset($this->password)) {
-//                $sql .= ', password_hash = :password_hash';
-//            }
-//
-//            $sql .= "\nWHERE id = :id";
-//            //$sql .= "WHERE id = :id";
-//
-//
-//            $conn = $this->database->getConnection();
-//            $stmt = $conn->prepare($sql);
-//
-//
-//            $stmt->bindValue(':id', $this->id, PDO::PARAM_STR);
-//            $stmt->bindValue(':firstname', $this->firstname, PDO::PARAM_STR);
-//            $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
-//            $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
-//            $stmt->bindValue(':is_active', $this->is_active, PDO::PARAM_BOOL);
-//            $stmt->bindValue(':is_access', $this->is_access, PDO::PARAM_BOOL);
-//            $stmt->bindValue(':is_admin', $this->is_admin, PDO::PARAM_BOOL);
-//            $stmt->bindValue(':memstart', $this->memstart, PDO::PARAM_STR);
-//            $stmt->bindValue(':memfin', $this->memfin, PDO::PARAM_STR);
-//
-//            // Add password if it's set
-//            if (isset($this->password)) {
-//                $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
-//                $stmt->bindParam(':password_hash', $password_hash, PDO::PARAM_STR);
-//            }
-//
-//            return $stmt->execute();
-//        }
-//
-//        return false;
-//    }
+        // Add password if it's set
+        if (isset($this->password)) {
+            $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
+            $stmt->bindParam(':password_hash', $password_hash, PDO::PARAM_STR);
+        }
 
-//    public function activate($value): void {
-//        $token = new Token($value);
-//        $hashed_token = $token->getHash();
-//        $sql = 'UPDATE user SET is_active = 1, is_access = 1, activation_hash = null WHERE activation_hash = :hashed_token';
-//        $conn = $this->database->getConnection();
-//        $stmt = $conn->prepare($sql);
-//        $stmt->bindParam(':hashed_token', $hashed_token, PDO::PARAM_STR);
-//        $stmt->execute();
-//    }
+        return $stmt->execute();
+    }
 
-//    public function delete(string $id): bool {
-//        $sql = 'DELETE FROM user WHERE id = :id';
-//        $conn = $this->database->getConnection();
-//        $stmt = $conn->prepare($sql);
-//        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-//        return $stmt->execute();
-//    }
+    return false;
+    }
 
 
     public function delete(string $id): bool {

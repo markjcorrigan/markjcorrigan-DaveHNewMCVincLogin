@@ -3,23 +3,16 @@
 namespace App\Controllers;
 
 use App\Database;
-use Exception;
 use Framework\Controller;
 use Framework\Exceptions\PageNotFoundException;
-use Framework\Flash;
 use Framework\Mail;
 use Framework\MVCTemplateViewer;
 use Framework\Response;
-use Framework\Token;
 use Framework\View;
 use App\Models\User;
 use PDO;
 
-/**
- * Signup controller
- *
- * PHP version 7.0
- */
+
 class Signup extends Controller
 {
     public function __construct(protected readonly Database $database, private readonly User $model, protected readonly View $view)
@@ -63,70 +56,6 @@ class Signup extends Controller
     }
 
 
-
-
-//    public function create(): Response {
-//        if (!empty($_POST["firstname"])) {
-//            $this->redirect('/signup/success');
-//        } else {
-//            $user = new User($this->database, new MVCTemplateViewer());
-//            $user->setData($_POST);
-//            if ($user->save()) {
-//                $_SESSION['activation_hash'] = $user->activation_hash;
-//                $_SESSION['activation_token'] = $user->activation_token;
-//                return $this->redirect('/signup/success');
-//            } else {
-//                $content = $this->view->renderTemplate('Signup/new.html', [
-//                    'user' => $user,
-//                    'errors' => $user->errors
-//                ]);
-//                return new Response($content);
-//            }
-//        }
-//    }
-
-
-//    public function create(): Response {  //Previous create method before one above
-//        $validationData = [
-//            "name" => $this->request->post["name"],
-//            "email" => $this->request->post["email"],
-//            "password" => $this->request->post["password"],
-//            "password_confirmation" => $this->request->post["password_confirmation"],
-//        ];
-//
-//        $this->model->clearErrors();
-//
-//        $this->model->userCreateVal($validationData);
-//
-//        if (empty($this->model->getErrors())) {
-//            $insertData = [
-//                "name" => $validationData["name"],
-//                "email" => $validationData["email"],
-//                "password_hash" => password_hash($validationData["password"], PASSWORD_DEFAULT),
-//
-//            ];
-//
-//            if ($this->model->insert($insertData)) {
-//                Flash::addMessage('User created successfully');
-//                return $this->redirect("/signup/{$this->model->getInsertID()}/show");
-//            }
-//        }
-//
-//        $content = $this->view->renderTemplate('Signup/new.html', [
-//            "errors" => $this->model->getErrors(),
-//            "user" => [
-//                "name" => $validationData["name"],
-//                "email" => $validationData["email"],
-//                "password" => $validationData["password"],
-//                "password_confirmation" => $validationData["password_confirmation"],
-//            ]
-//        ]);
-//
-//        return new Response($content);
-//    }
-
-
-    //////////////////////////work on below
     public function update(string $id): Response {
         $user = $this->getUser($id);
 
@@ -197,10 +126,6 @@ class Signup extends Controller
     }
 
 
-
-
-
-
     public function findByActivationHash($activation_hash): ?User {
         $conn = $this->database->getConnection();
         $stmt = $conn->prepare('SELECT * FROM user WHERE activation_hash = :activation_hash');
@@ -230,80 +155,13 @@ class Signup extends Controller
         return $this->redirect('/signup/activated');
     }
 
-//    public function activate(): Response
-//    {
-//        $token = new Token();
-//        $tokenResult = $token->getValue();
-//        $this->model->activate($this->$tokenResult);
-//
-//        Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
-//        return $this->redirect('/signup/activated');
-//    }
 
-
-
-
-
-//    public function activate(string $token): Response
-//    {
-////        $tokenObj = new Token();
-////        $token = $tokenObj->getValue();
-//////        $hash = $tokenObj->getHash();
-//
-//         $this->model->activate($token);
-//         Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
-//         return $this->redirect('/signup/activated');
-//    }
-
-
-//    public function activate(): Response
-//    {
-//        $params = func_get_args();
-//        $token = $params[0];
-//        $this->model->activate($token);
-//        Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
-//        return $this->redirect('/signup/activated');
-//    }
-
-
-
-
-
-//    public function activate(): Response
-//    {
-//        $uri = $_SERVER['REQUEST_URI'];
-//        $parts = explode('/', $uri);
-//        $token = end($parts);
-//        $this->model->activate($token);
-//        Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
-//        return $this->redirect('/signup/activated');
-//    }
-
-
-
-//    public function activate(): Response {
-//        $uri = $_SERVER['REQUEST_URI'];
-//        $parts = explode('/', $uri);
-//        $token = end($parts);
-//        $this->model->activate($token);
-//        Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
-//        return $this->redirect('/signup/activated');
-//    }
-
-
-    /**
-     * Show the activation success page
-     *
-     * @return void
-     */
     public function activated(): Response
     {
         $content = $this->view->renderTemplate('Signup/activated.html');
         return new Response($content);
 
     }
-
-
 
 
     public function show(string $id): Response
@@ -349,10 +207,7 @@ class Signup extends Controller
 
         $this->model->delete($id);
 
-//        return $this->redirect("/users/index");
         return $this->redirect("/signup/index");
     }
-
-
 
 }
