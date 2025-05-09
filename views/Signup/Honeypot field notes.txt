@@ -1,0 +1,137 @@
+
+
+DONE ABSOLUTELYNOCLUE AND UPGUIARHILL 
+WILL WAIT FOR A WHILE AND CHECK THIS OUT TO SEE IF IT WORKS
+
+
+Step 1.
+Go to /App/Views/Signup/new.html
+&&&&&
+Step 1 B)  o to /App/base.html
+
+Put in:
+
+ <!--  Create style for the honeypot -->
+  <style>
+		.hide-robot{
+			display:none;
+		}
+		</style>
+  
+  <!-- honeypot style end -->
+I.e. commented out you can see the honeypot field.
+Not commented it cannot be seen except by BOTS.
+
+
+Step 2.  
+In new.html just before submit button put:
+ <!-- Create fields for the honeypot -->
+      <div class="form-group">
+  <input name="firstname" type="text" id="firstname" class="hide-robot">
+           </div>
+    <!-- honeypot fields end -->
+
+Step 3.  /App/Models/User.php
+
+WORK ON THE SAVE() CONTROLLER:
+
+   public function save()
+    {
+        $this->validate();
+
+        if (empty($this->errors)) {
+
+            $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
+
+            $token = new Token();
+            $hashed_token = $token->getHash();
+            $this->activation_token = $token->getValue();
+            
+            /////////////NB firstname below is a honeypot field////////////
+
+            $sql = 'INSERT INTO users (name, email, password_hash, activation_hash, firstname)
+                    VALUES (:name, :email, :password_hash, :activation_hash, :firstname)';
+
+            $db = static::getDB();
+            $stmt = $db->prepare($sql);
+
+            $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
+            $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
+            $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
+            $stmt->bindValue(':activation_hash', $hashed_token, PDO::PARAM_STR);
+            ////////////////honeypot field below//////////////
+                $stmt->bindValue(':firstname', $this->firstname, PDO::PARAM_STR);
+            ////////////////honeypot field above///////////////
+
+  
+    try {
+                return $stmt->execute();
+            } catch (\PDOException $e) {
+                error_log($e->getMessage());
+            }
+        }
+
+        return false;
+    }
+
+
+
+Step 4:
+ALSO WORK ON THE SIGNUP() CONTROLLER:
+
+
+    /**
+     * Sign up a new user
+     *
+     * @param array $data Data from the signup form
+     *
+     * @return boolean  True if the new user was created, false otherwise
+     */
+    public function signup($data)
+    {
+        $this->name = $data['name'];
+        $this->email = $data['email'];
+        $this->password = $data['password'];
+        
+        //////////////////////firstname below is a honey pot field//////////////
+            $this->firstname = $data['firstname'];
+
+        $this->validate();
+
+        if (empty($this->errors)) {
+
+            $token = new Token();
+            $hashed_token = $token->getHash();
+            $this->activation_token = $token->getValue();
+
+            $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
+            
+            //////////////////////firstname below is a honey pot field//////////////
+
+            $sql = 'INSERT INTO users (name, email, password_hash, activation_token, firstname)
+                    VALUES (:name, :email, :password_hash, :activation_token, :firstname)';
+                                              
+            $db = static::getDB();
+            $stmt = $db->prepare($sql);
+                                                  
+            $stmt->bindParam(':name', $this->name, PDO::PARAM_STR);
+            $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
+            $stmt->bindParam(':password_hash', $password_hash, PDO::PARAM_STR);
+            $stmt->bindParam(':activation_token', $hashed_token, PDO::PARAM_STR);
+            //////////////////////firstname below is a honey pot field//////////////
+                $stmt->bindParam(':firstname', $this->firstname, PDO::PARAM_STR);
+
+           try {
+                return $stmt->execute();
+            } catch (\PDOException $e) {
+                error_log($e->getMessage());
+            }
+        }
+
+        return false;
+    }
+
+
+Step 5:
+
+Create a firstname varchar 50 field in mysql in User Table just after the id field.

@@ -2,9 +2,12 @@
 
 namespace App\Controllers;
 
-use \Core\View;
-use \App\Auth;
-use \App\Flash;
+use App\Database;
+use App\Models\User;
+use Framework\Response;
+use Framework\View;
+use Framework\Auth;
+use Framework\Flash;
 
 /**
  * Profile controller
@@ -14,61 +17,68 @@ use \App\Flash;
 class Profile extends Authenticated
 {
 
-    /**
-     * Before filter - called before each action method
-     *
-     * @return void
-     */
-//    protected function before()
+    public function __construct(protected readonly Database $database, private readonly User $model, protected readonly View $view, protected Auth $auth) {
+    }
+
+
+
+//    protected function before(): void
 //    {
 //        parent::before();
 //
-//        $this->user = Auth::getUser();
+//        $user = $this->auth->getUser();
 //    }
 
-    /**
-     * Show the profile
-     *
-     * @return void
-     */
-    public function showAction()
-    {
-        View::renderTemplate('Profile/show.html', [
-            'user' => $this->user
+
+    public function show(): Response {
+        $user = $this->auth->getUser();
+        $content = $this->view->renderTemplate('Profile/show.html', [
+            "user" => $user
         ]);
+        return new Response($content);
     }
 
-    /**
-     * Show the form for editing the profile
-     *
-     * @return void
-     */
-    public function editAction()
-    {
-        View::renderTemplate('Profile/edit.html', [
-            'user' => $this->user
+    public function edit(): Response {
+        $user = $this->auth->getUser();
+        $content = $this->view->renderTemplate('Profile/edit.html', [
+            "user" => $user
         ]);
+        return new Response($content);
     }
 
-    /**
-     * Update the profile
-     *
-     * @return void
-     */
-    public function updateAction()
-    {
-        if ($this->user->updateProfile($_POST)) {
 
+    public function update(): Response
+    {
+        $user = $this->auth->getUser();
+        $data = $_POST;
+        $data['id'] = $user->id; // set the ID of the current user
+        if ($this->model->updateProfile($data)) {
             Flash::addMessage('Changes saved');
-
-            $this->redirect('/profile/show');
-
+            return $this->redirect('/profile/show'); // Return the Response object
         } else {
-
-            View::renderTemplate('Profile/edit.html', [
-                'user' => $this->user
+            $content = $this->view->renderTemplate('Profile/edit.html', [
+                "user" => $user
             ]);
-
+            return new Response($content); // Return the Response object
         }
     }
+
+
+
+
+//    public function update() {
+//        $user = $this->auth->getUser();
+//        if ($user->updateProfile($_POST)) {
+//            Flash::addMessage('Changes saved');
+//            $this->redirect('/profile/show');
+//        } else {
+//            $content = $this->view->renderTemplate('Profile/edit.html', [
+//                "user" => $user
+//            ]);
+//            return new Response($content);
+//        }
+//    }
+
+
 }
+

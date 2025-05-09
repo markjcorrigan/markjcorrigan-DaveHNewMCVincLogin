@@ -24,6 +24,8 @@ $router->add('password/reset/{token:[\da-f]+}', ['controller' => 'Password', 'ac
 $router->add('signup/activate/{token}', ['controller' => 'Signup', 'action' => 'activate']);
 
 //$router->add('signup/activate/{token:[\da-f]+}', ['controller' => 'Signup', 'action' => 'activate']);
+$router->add('profile/show', ['controller' => 'profile', 'action' => 'show', "middleware" => "deny"]);
+$router->add('profile/edit', ['controller' => 'profile', 'action' => 'edit', "middleware" => "deny"]);
 $router->add('items/index', ['controller' => 'items', 'action' => 'index', "middleware" => "deny"]);
 $router->add('items/{action:.*}', ['controller' => 'items', "middleware" => "deny"]);
 

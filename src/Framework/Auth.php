@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Framework;
 
-use App\Database;
 use App\Models\RememberedLogin;
 use App\Models\User;
 
 
 readonly class Auth
 {
+//    public function __construct(protected RememberedLogin $rememberedLogin, protected User $model)
     public function __construct(protected RememberedLogin $rememberedLogin, private User $model)
     {
     }
