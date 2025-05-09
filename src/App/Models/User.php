@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Database;
+use App\Controllers;
 use DateTime;
 use Framework\Auth;
+use Framework\Flash;
 use Framework\Model;
 use Framework\MVCTemplateViewer;
 use Framework\Paginator;
@@ -13,6 +15,7 @@ use PDO;
 use Framework\Token;
 use Framework\Mail;
 use Framework\View;
+use PDOException;
 
 /**
  * User model
@@ -65,7 +68,7 @@ class User extends Model
 //
 //    }
 
-    public function __construct(Database $database, protected readonly MVCTemplateViewer $view)
+    public function __construct(Database $database, protected MVCTemplateViewer $view)
     {
         parent::__construct($database);
     }
@@ -249,22 +252,22 @@ class User extends Model
             $token = new Token();
             $hashed_token = $token->getHash();
             $this->activation_token = $token->getValue();
-
-            $this->activation_hash = $hashed_token; // Add this line  NBNBNB Meta AI recommended this.
+            $this->activation_hash = $hashed_token;
 
 
             /////////////NB firstname below is a honeypot field////////////
 
-            $sql = 'INSERT INTO user (firstname, name, email, password_hash, activation_hash)
-                    VALUES (:firstname, :name, :email, :password_hash, :activation_hash)';
-
+//            $sql = 'INSERT INTO user (firstname, name, email, password_hash, activation_hash)
+//                    VALUES (:firstname, :name, :email, :password_hash, :activation_hash)';
+            $sql = 'INSERT INTO user (name, email, password_hash, activation_hash)
+                    VALUES (:name, :email, :password_hash, :activation_hash)';
             $conn = $this->database->getConnection();
             $stmt = $conn->prepare($sql);
 
 
             ////////////////honeypot field below//////////////
-            $this->firstname = '';
-            $stmt->bindValue(':firstname', $this->firstname, PDO::PARAM_STR);
+//            $this->firstname = '';
+//            $stmt->bindValue(':firstname', $this->firstname, PDO::PARAM_STR);
             ////////////////honeypot field above///////////////
             $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
             $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
@@ -305,8 +308,8 @@ class User extends Model
 
     public function sendActivationEmail(): void {
         //NB https for server to public
-        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_token; //Note that the anc web site code has $this->activation_hash; which I believe is wrong.
-
+ $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_hash;
+      //  $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_hash; //Note that the anc web site code has $this->activation_hash; which I believe is wrong.
         $text = $this->view->render('Signup/activation_email.txt', ['url' => $url]);
         $html = $this->view->render('Signup/activation_email.html', ['url' => $url]);
         Mail::send($this->email, 'Account activation', $text, $html);
@@ -366,7 +369,9 @@ class User extends Model
         $hashed_token = $token->getHash();
         $this->remember_token = $token->getValue();
 
-        $this->expiry_timestamp = time() + 60 * 60 * 24 * 30;  // 30 days from now
+//        $this->expiry_timestamp = time() + 60 * 60 * 24 * 30;  // 30 days from now
+        $this->expiry_timestamp = time() + 60 * 60 * 24 * 90; //90 days from now
+
 
         $sql = 'INSERT INTO remembered_logins (token_hash, user_id, expires_at)
                 VALUES (:token_hash, :user_id, :expires_at)';
@@ -424,9 +429,7 @@ class User extends Model
     protected function sendPasswordResetEmail(): Response
     {
         ///  $url = 'https://' . $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->password_reset_token;  /////backed up while hosting locally
-        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->password_reset_token;  /////backed up while hosting locally
-//        $url = 'https://' . $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->password_reset_token;
-
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->password_reset_token;
 
 //        $view = new \Framework\View();
 
@@ -468,8 +471,8 @@ class User extends Model
         $user = $this->findByEmail($email);
 
         //if ($user) {
-//        if ($user && $user->is_active) {
-        if ($user) {
+
+        if ($user && $user->is_active) {
             if (password_verify($password, $user->password_hash)) {
                 return $user;
             }
@@ -572,35 +575,80 @@ class User extends Model
     }
 
 
-    public function activate(string $value): void
+    public function activate($token): bool
     {
-        $token = new Token($value);
-        $hashed_token = $token->getHash();
-
-        // $sql = 'UPDATE users
-        //         SET is_active = 1,
-        //   ///////////////////////////////////////////////////////////////      is_access=1
-        //         activation_token = null
-        //         WHERE activation_token = :hashed_token';
-
-        $sql = 'UPDATE user
-                SET is_active = 1,
-                is_access = 1,
-                    activation_hash = null
-                WHERE activation_hash = :hashed_token';
-
-
+        $sql = 'UPDATE user SET is_active = 1, is_access = 1, activation_hash = null WHERE activation_hash = :token';
         $conn = $this->database->getConnection();
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':hashed_token', $hashed_token, PDO::PARAM_STR);
-
-        $stmt->execute();
-
-        // Error logging per dave.  Not sure it works?     if ($stmt->execute() === false) {
-
-        // print_r($stmt->errorInfo());
-
+        $stmt->bindParam(':token', $token);
+        return $stmt->execute();
     }
+
+
+
+
+//    public  function activate($value): void
+//    {
+//        $token = new Token();
+//        $hashed_token = $token->getHash();
+//
+//        $sql = 'UPDATE user
+//                SET is_active = 1,
+//                    activation_hash = null
+//                WHERE activation_hash = :hashed_token';
+//
+//
+//        $conn = $this->database->getConnection();
+//        $stmt = $conn->prepare($sql);
+//
+//        $stmt->bindValue(':hashed_token', $hashed_token, PDO::PARAM_STR);
+//
+//        $stmt->execute();
+//    }
+//        $this->activation_token = $token->getValue();
+
+//        $sql = 'SELECT activation_hash FROM user WHERE activation_hash = :hashed_token';
+//        $conn = $this->database->getConnection();
+//        $stmt = $conn->prepare($sql);
+//        $stmt->bindParam(':hashed_token', $hashed_token, PDO::PARAM_STR);
+//        $stmt->execute();
+//        $result = $stmt->fetch();
+//
+//        if ($result) {
+//            Flash::addMessage('Debug if hash is found', Flash::WARNING);
+//        } else {
+//            Flash::addMessage('Debug if hash is not found', Flash::WARNING);
+//        }
+//
+//        $sql = 'UPDATE user SET is_active = 1, is_access = 1, activation_hash = null WHERE activation_hash = :hashed_token';
+//        $stmt = $conn->prepare($sql);
+//        $stmt->bindParam(':hashed_token', $hashed_token, PDO::PARAM_STR);
+//        $stmt->execute();
+//        var_dump($stmt->rowCount()); // Debug the number of rows affected
+//        $stmt->execute();
+//    }
+
+
+
+
+//    public function activate(string $value): void
+//    {
+//        $token = new Token($value);
+//        $hashed_token = $token->getHash();
+//
+//        $sql = 'UPDATE user
+//                SET is_active = 1,
+//               is_access = 1,
+//                    activation_hash = null
+//                WHERE activation_hash = :hashed_token';
+//
+//
+//        $conn = $this->database->getConnection();
+//        $stmt = $conn->prepare($sql);
+//        $stmt->bindParam(':hashed_token', $hashed_token, PDO::PARAM_STR);
+//
+//        $stmt->execute();
+//    }
 
 
     public function updateProfile(array $data): bool

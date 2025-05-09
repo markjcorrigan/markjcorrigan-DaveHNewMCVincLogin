@@ -80,19 +80,32 @@ class Dispatcher
     private function getActionArguments(string $controller, string $action, array $params): array
     {
         $args = [];
-        
         $method = new ReflectionMethod($controller, $action);
-
         foreach ($method->getParameters() as $parameter) {
-
             $name = $parameter->getName();
-
-            $args[$name] = $params[$name];
-
+            $args[] = $params[$name] ?? $params['route_params'][$name] ?? null;
         }
-
         return $args;
     }
+
+
+
+//    private function getActionArguments(string $controller, string $action, array $params): array
+//    {
+//        $args = [];
+//
+//        $method = new ReflectionMethod($controller, $action);
+//
+//        foreach ($method->getParameters() as $parameter) {
+//
+//            $name = $parameter->getName();
+//
+//            $args[$name] = $params[$name];
+//
+//        }
+//
+//        return $args;
+//    }
 
     private function getControllerName(array $params): string
     {

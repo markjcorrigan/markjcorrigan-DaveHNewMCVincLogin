@@ -3,13 +3,16 @@
 namespace App\Controllers;
 
 use App\Database;
+use Exception;
 use Framework\Controller;
 use Framework\Exceptions\PageNotFoundException;
+use Framework\Flash;
 use Framework\Mail;
 use Framework\MVCTemplateViewer;
 use Framework\Response;
+use Framework\Token;
 use Framework\View;
-use \App\Models\User;
+use App\Models\User;
 use PDO;
 
 /**
@@ -19,7 +22,7 @@ use PDO;
  */
 class Signup extends Controller
 {
-    public function __construct(protected readonly Database $database, private readonly User $model, protected readonly View $view) //I need to select either $user or $model.  Went with $model Also View and MVCTemplateViewer
+    public function __construct(protected readonly Database $database, private readonly User $model, protected readonly View $view)
     {
     }
 
@@ -58,6 +61,30 @@ class Signup extends Controller
             }
         }
     }
+
+
+
+
+//    public function create(): Response {
+//        if (!empty($_POST["firstname"])) {
+//            $this->redirect('/signup/success');
+//        } else {
+//            $user = new User($this->database, new MVCTemplateViewer());
+//            $user->setData($_POST);
+//            if ($user->save()) {
+//                $_SESSION['activation_hash'] = $user->activation_hash;
+//                $_SESSION['activation_token'] = $user->activation_token;
+//                return $this->redirect('/signup/success');
+//            } else {
+//                $content = $this->view->renderTemplate('Signup/new.html', [
+//                    'user' => $user,
+//                    'errors' => $user->errors
+//                ]);
+//                return new Response($content);
+//            }
+//        }
+//    }
+
 
 //    public function create(): Response {  //Previous create method before one above
 //        $validationData = [
@@ -154,6 +181,8 @@ class Signup extends Controller
     }
 
 
+
+
     public function success(): Response {
         if (isset($_SESSION['activation_hash'])) {
             $user = $this->findByActivationHash($_SESSION['activation_hash']);
@@ -166,6 +195,11 @@ class Signup extends Controller
             return new Response($content);
         }
     }
+
+
+
+
+
 
     public function findByActivationHash($activation_hash): ?User {
         $conn = $this->database->getConnection();
@@ -195,6 +229,66 @@ class Signup extends Controller
         Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
         return $this->redirect('/signup/activated');
     }
+
+//    public function activate(): Response
+//    {
+//        $token = new Token();
+//        $tokenResult = $token->getValue();
+//        $this->model->activate($this->$tokenResult);
+//
+//        Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
+//        return $this->redirect('/signup/activated');
+//    }
+
+
+
+
+
+//    public function activate(string $token): Response
+//    {
+////        $tokenObj = new Token();
+////        $token = $tokenObj->getValue();
+//////        $hash = $tokenObj->getHash();
+//
+//         $this->model->activate($token);
+//         Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
+//         return $this->redirect('/signup/activated');
+//    }
+
+
+//    public function activate(): Response
+//    {
+//        $params = func_get_args();
+//        $token = $params[0];
+//        $this->model->activate($token);
+//        Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
+//        return $this->redirect('/signup/activated');
+//    }
+
+
+
+
+
+//    public function activate(): Response
+//    {
+//        $uri = $_SERVER['REQUEST_URI'];
+//        $parts = explode('/', $uri);
+//        $token = end($parts);
+//        $this->model->activate($token);
+//        Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
+//        return $this->redirect('/signup/activated');
+//    }
+
+
+
+//    public function activate(): Response {
+//        $uri = $_SERVER['REQUEST_URI'];
+//        $parts = explode('/', $uri);
+//        $token = end($parts);
+//        $this->model->activate($token);
+//        Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
+//        return $this->redirect('/signup/activated');
+//    }
 
 
     /**

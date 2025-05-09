@@ -39,32 +39,61 @@ class Login extends Controller
      */
 
 
-
     public function create(): Response {
-      $user = $this->model->authenticate($_POST['email'], $_POST['password']);
-
-        $remember_me = isset($_POST['remember_me']);
-
-        if ($user) {
-
-            Auth::login($user, $remember_me);
-
-            Flash::addMessage('Login successful');
-            $content = $this->view->renderTemplate('Login/success.html', [
-                'user' => $user,
-            ]);
-            return new Response($content);
-          //  $this->>redirect(Auth::getReturnToPage());  //video 44
-        } else {
-            Flash::addMessage('Login unsuccessful, please try again', Flash::WARNING);
+        if (isset($_POST['email']) && isset($_POST['password'])) {
+            $user = $this->model->authenticate($_POST['email'], $_POST['password']);
             $remember_me = isset($_POST['remember_me']);
-            $content = $this->view->renderTemplate('Login/new.html', [
-                'email' => $_POST['email'],
-                'remember_me' => $remember_me
-            ]);
+
+            if ($user) {
+                Auth::login($user, $remember_me);
+                Flash::addMessage('Login successful');
+                $content = $this->view->renderTemplate('Login/success.html', [
+                    'user' => $user,
+                ]);
+                return new Response($content);
+            } else {
+                Flash::addMessage('Login unsuccessful, please try again', Flash::WARNING);
+                $remember_me = isset($_POST['remember_me']);
+                $content = $this->view->renderTemplate('Login/new.html', [
+                    'email' => $_POST['email'],
+                    'remember_me' => $remember_me
+                ]);
+                return new Response($content);
+            }
+        } else {
+            Flash::addMessage('Please enter your email and password', Flash::WARNING);
+            $content = $this->view->renderTemplate('Login/new.html');
             return new Response($content);
         }
     }
+
+
+
+//    public function create(): Response {
+//      $user = $this->model->authenticate($_POST['email'], $_POST['password']);
+//
+//        $remember_me = isset($_POST['remember_me']);
+//
+//        if ($user) {
+//
+//            Auth::login($user, $remember_me);
+//
+//            Flash::addMessage('Login successful');
+//            $content = $this->view->renderTemplate('Login/success.html', [
+//                'user' => $user,
+//            ]);
+//            return new Response($content);
+//          //  $this->>redirect(Auth::getReturnToPage());  //video 44
+//        } else {
+//            Flash::addMessage('Login unsuccessful, please try again', Flash::WARNING);
+//            $remember_me = isset($_POST['remember_me']);
+//            $content = $this->view->renderTemplate('Login/new.html', [
+//                'email' => $_POST['email'],
+//                'remember_me' => $remember_me
+//            ]);
+//            return new Response($content);
+//        }
+//    }
 
 
     /////NB above is the code that I am working on getting aligned with David's course.  Below works sort of per last git save

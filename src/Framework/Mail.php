@@ -16,8 +16,11 @@ class Mail
         //$mail->SMTPDebug = 3;
         //$mail->SMTPDebug = 2;
         $mail->isSMTP();
-        $mail->Host = Config::SMTP_HOST;
-        $mail->Port = Config::SMTP_PORT;
+
+        $mail->Host = $_ENV["SMTP_HOST"];
+//        $mail->Host = Config::SMTP_HOST;
+            $mail->Port = $_ENV["SMTP_PORT"];
+//        $mail->Port = Config::SMTP_PORT;
         //$mail->SMTPAuth = false;
 		$mail->SMTPAuth = true;
         //$mail->SMTPSecure = false;
@@ -27,8 +30,10 @@ class Mail
 		$mail->SMTPSecure = 'tls';   // Enable encryption, 'ssl'  nb added after
 		$mail->SMTPKeepAlive = true;
         //after//$mail->SMTPAutoTLS = false;  //or true
-        $mail->Username = Config::SMTP_USER;
-        $mail->Password = Config::SMTP_PASSWORD;
+        $mail->Username = $_ENV["SMTP_USER"];
+//        $mail->Username = Config::SMTP_USER;
+        $mail->Password = $_ENV["SMTP_PASSWORD"];
+//        $mail->Password = Config::SMTP_PASSWORD;
       
         $mail->CharSet = 'UTF-8';
      
