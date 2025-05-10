@@ -1,4 +1,4 @@
-Hi.
+Hi. FYI only.
 
 I set myself a challenge to convert Dave Hollingworth's Registration and Login course, created a while ago, to work on his new MVC framework, released this year.
 I do not say that I have understood all the issues as his MVC course now deals with a number of new approaches including an awesome router based on pattern matching and capture groups, a container, dependency injection, php v 8+ and declare(strict_types=1) etc.
