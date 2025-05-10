@@ -22,8 +22,10 @@ Hello {{ current_user.name }}.
 <h1>Home page</h1>
 <br>
 <br>
-<a href="/signup/new">New Test User</a> <p>NB this is a crud for testing purposes.  User Management below requires one to be logged on.</p><br>
-<a href="/signup/index">User Management</a>
+<a href="/signup/new">New Test User</a> <p>NB this is a crud for testing purposes and will be removed.<br>
+    Profile Management below requires one to be logged on.</p><br>
+<a href="/signup/index">User Management</a><br>
+<a href="/profile/show">Profile Management</a>
     {% endif %}
 
 {% endblock %}

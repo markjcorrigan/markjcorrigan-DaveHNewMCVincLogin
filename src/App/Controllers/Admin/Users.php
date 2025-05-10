@@ -13,11 +13,7 @@ use Framework\Flash;
 use Framework\Auth;
 use Framework\Paginator;
 
-/**
- * User admin controller
- *
- * PHP version 7.0
- */
+
 class Users extends \App\Controllers\Authenticated
 {
     public function __construct(protected readonly Database $database, private readonly User $model, protected readonly View $view, protected Auth $auth) {
@@ -47,9 +43,6 @@ class Users extends \App\Controllers\Authenticated
     }
 
 
-
-
-
     public function show(): Response {
         $request = new Request(); // Assuming you have a Request class
         $id = $request->post['id'];
@@ -57,7 +50,7 @@ class Users extends \App\Controllers\Authenticated
         $content = $this->view->renderTemplate('Admin/Users/show.html', [
             'user' => $user
         ]);
-        return new Response($content); // You had return new Response($user); which might cause issues if $user is not a string
+        return new Response($content); 
     }
 
 
