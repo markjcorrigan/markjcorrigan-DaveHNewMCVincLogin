@@ -16,7 +16,9 @@ Hello {{ current_user.name }}.
 <a href="/signup/new">New Test User</a><br>
 <a href="/signup/index">User Management</a><br>
 
-<a href="/profile/show">Profile Management</a>
+<a href="/profile/show">Profile Management</a><br>
+<a href="/admin/users/index">Admin of Users Management</a>
+<p>Admin is for the users who have is_admin = 1 in the database</p>
 
     {% else %}
 <h1>Home page</h1>

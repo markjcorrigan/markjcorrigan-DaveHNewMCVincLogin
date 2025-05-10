@@ -4,44 +4,44 @@
 
 {% block body %}
 
-    <h1>User admin</h1>
+<h1>User admin</h1>
 
-    <a href="/admin/users/new">New</a>
+<a href="/admin/users/new">New</a>
 
-    <table class="table">
-        <thead>
-            <tr>
-                  <th>Name</th>
-                  <th>email</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-                  <tr>
-                      <td><a href="/admin/users/{{ user.id }}/show">{{ user.name }}</a></td>
-                      <td>{{ user.email }}</td>
-                  </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>email</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+    <tr>
+        <td><a href="/admin/users/{{ user.id }}/show">{{ user.name }}</a></td>
+        <td>{{ user.email }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
-    <nav aria-label="Pagination">
-        <ul class="pager">
-            <li>
-                {% if page == 1 %}
-                    Previous
-                {% else %}
-                    <a href="/admin/users/index?page={{ page - 1 }}">Previous</a>
-                {% endif %}
-            </li>
-            <li>
-                {% if page == total_pages %}
-                    Next
-                {% else %}
-                    <a href="/admin/users/index?page={{ page + 1 }}">Next</a>
-                {% endif %}
-            </li>
-        </ul>
-    </nav>
+<nav aria-label="Pagination">
+    <ul class="pager">
+        <li>
+            {% if page == 1 %}
+            Previous
+            {% else %}
+            <a href="/admin/users/index?page={{ page - 1 }}">Previous</a>
+            {% endif %}
+        </li>
+        <li>
+            {% if page == total_pages %}
+            Next
+            {% else %}
+            <a href="/admin/users/index?page={{ page + 1 }}">Next</a>
+            {% endif %}
+        </li>
+    </ul>
+</nav>
 
 {% endblock %}

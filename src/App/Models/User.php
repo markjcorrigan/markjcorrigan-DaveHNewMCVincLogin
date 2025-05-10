@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Database;
 
+use Framework\Auth;
+use Framework\Flash;
 use Framework\Model;
 use Framework\MVCTemplateViewer;
 use Framework\Paginator;
@@ -173,9 +175,9 @@ class User extends Model
         }
     }
 
-    public function userUpdateVal(array $data, ?string $id): void
+    public function userUpdateVal(array $data): void
     {
-        $this->clearErrors(); // Clear any existing errors
+        $this->clearErrors();
         // Use the validation logic from validateUser
         // Name
         if (!preg_match('/^[A-Za-z0-9\x{00C0}-\x{00FF}]+ ?[A-Za-z0-9\x{00C0}-\x{00FF}]+$/u', $data["name"])) {
@@ -186,6 +188,8 @@ class User extends Model
             $this->addError("email", "Email is required");
         } elseif (filter_var($data["email"], FILTER_VALIDATE_EMAIL) === false) {
             $this->addError('email', 'Invalid email');
+        } elseif ($this->emailExists($data["email"], $this->id)) {
+            $this->addError('email', 'email already taken');
         }
         // Password
         if (isset($data["password"]) && isset($data["password_confirmation"])) {
@@ -201,6 +205,8 @@ class User extends Model
             }
         }
     }
+
+
 
 
     public function emailExists(string $email, $id = null): bool
@@ -442,22 +448,25 @@ class User extends Model
     }
 
 
+
     public function findByID(string $id): ?User
     {
         $sql = 'SELECT * FROM user WHERE id = :id';
         $conn = $this->database->getConnection();
         $stmt = $conn->prepare($sql);
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
         $userData = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($userData) {
-            foreach ($userData as $key => $value) {
-                $this->$key = $value;
-            }
-            return $this;
+            $user = new User($this->database, $this->view);
+            $user->setData($userData);
+            return $user;
         }
         return null;
     }
+
+
+
 
 
     public function findByUserID(string $id): mixed
@@ -528,11 +537,12 @@ class User extends Model
 
 
 
-    public function paginate(string $page): array
+
+    public function paginate(int $page): array
     {
         $conn = $this->database->getConnection();
 
-        $total_records = (int)$conn->query('SELECT COUNT(id) FROM user')->fetchColumn();
+        $total_records = (int) $conn->query('SELECT COUNT(id) FROM user')->fetchColumn();
 
         $records_per_page = 5;
 
@@ -555,6 +565,35 @@ class User extends Model
 
         return [$result, $paginator->getPage(), $paginator->getTotalPages()];
     }
+
+
+//    public function paginate(int $page): array
+//    {
+//        $conn = $this->database->getConnection();
+//        $total_records = (int)$conn->query('SELECT COUNT(id) FROM user')->fetchColumn();
+//        $records_per_page = 5;
+//        $paginator = new Paginator($total_records, $records_per_page, $page);
+//
+//        // Select one page of results
+//        $sql = 'SELECT * FROM user ORDER BY name LIMIT :limit OFFSET :offset';
+//        $stmt = $conn->prepare($sql);
+//        $stmt->bindValue(':limit', $records_per_page, PDO::PARAM_INT);
+//        $stmt->bindValue(':offset', $paginator->getOffset(), PDO::PARAM_INT);
+//        $stmt->execute();
+//
+//        // Fetch results as User objects
+//        $result = [];
+//        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+//            $user = new User($this->database, $this->view);
+//            foreach ($row as $key => $value) {
+//                $user->$key = $value;
+//            }
+//            $result[] = $user;
+//        }
+//
+//        return [$result, $paginator->getPage(), $paginator->getTotalPages()];
+//    }
+
 
 
     public function update(string $id, array $data): bool {
@@ -716,6 +755,132 @@ class User extends Model
 //
 //        return false;
 //    }
+
+
+
+
+    public function saveAdmin($data): bool
+    {
+        if (isset($this->id)) {
+            return $this->updateAdmin($data);
+        } else {
+            return $this->createAdmin($data);
+        }
+    }
+
+
+
+
+
+
+
+    public function createAdmin($data): bool
+    {
+        $this->name = $data['name'];
+        $this->email = $data['email'];
+        $this->password = $data['password'];
+        $this->is_active = ($data['is_active'] ?? '0') == '1';
+        $this->is_admin = ($data['is_admin'] ?? '0') == '1';
+
+        $this->validate($data);
+
+        if (empty($this->errors)) {
+            $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
+            $sql = "INSERT INTO user (name, email, password_hash, is_active, is_admin) VALUES (:name, :email, :password_hash, :is_active, :is_admin)";
+            $conn = $this->database->getConnection();
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
+            $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
+            $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
+            $stmt->bindValue(':is_active', $this->is_active, PDO::PARAM_BOOL);
+            $stmt->bindValue(':is_admin', $this->is_admin, PDO::PARAM_BOOL);
+
+            try {
+                $result = $stmt->execute();
+                $this->id = $conn->lastInsertId();
+                return $result;
+            } catch (\PDOException $e) {
+                echo "Error: " . $e->getMessage();
+                error_log($e->getMessage());
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public function updateAdmin($data): bool
+    {
+        $this->name = $data['name'];
+        $this->email = $data['email'];
+        $this->is_active = $data['is_active'] ?? false;
+        $this->is_admin = $data['is_admin'] ?? false;
+
+        // Only validate and update the password if a value provided
+        if ($data['password'] != '') {
+            $this->password = $data['password'];
+        }
+
+        $this->userUpdateVal($data);
+
+        if (empty($this->errors)) {
+            $sql = 'UPDATE user SET name = :name, email = :email, is_active = :is_active, is_admin = :is_admin';
+            // Add password if it's set
+            if (isset($this->password)) {
+                $sql .= ', password_hash = :password_hash';
+            }
+            $sql .= "\nWHERE id = :id";
+
+            $conn = $this->database->getConnection();
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->bindValue(':id', $this->id, PDO::PARAM_STR);
+            $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
+            $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
+            $stmt->bindValue(':is_active', $this->is_active, PDO::PARAM_BOOL);
+            $stmt->bindValue(':is_admin', $this->is_admin, PDO::PARAM_BOOL);
+
+            // Add password if it's set
+            if (isset($this->password)) {
+                $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
+                $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
+            }
+
+            try {
+                return $stmt->execute();
+            } catch (\PDOException $e) {
+                echo "Error: " . $e->getMessage();
+                error_log($e->getMessage());
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+
+
+
+
+
+    public static function deleteByID(Database $database, $id): void
+    {
+        $sql = 'DELETE FROM user WHERE id = :id';
+        $conn = $database->getConnection();
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
+
+
+
+
+
+
+
+
 
 
     public function delete(string $id): bool {

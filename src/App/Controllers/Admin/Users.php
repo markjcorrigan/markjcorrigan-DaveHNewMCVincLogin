@@ -13,104 +13,160 @@ use Framework\Flash;
 use Framework\Auth;
 use Framework\Paginator;
 
-
 class Users extends \App\Controllers\Authenticated
 {
-    public function __construct(protected readonly Database $database, private readonly User $model, protected readonly View $view, protected Auth $auth) {
+    public function __construct(
+        protected readonly Database $database,
+        private readonly User $model,
+        protected readonly View $view,
+        protected Auth $auth
+    ) {
     }
 
-    protected function before(): void
-    {
-        parent::before();
 
-        if (! $user = $this->auth->getUser()->is_admin) {
-            header('HTTP/1.1 403 Forbidden');
-            exit('You are not allowed to access that resource.');
+//    protected function before(): void
+//    {
+//        parent::before();
+//        error_log("Before method called");
+//        $user = $this->auth->getUser();
+//        error_log("User: " . print_r($user, true));
+//        if (!$user || !$user->is_admin) {
+//            error_log("User is not admin");
+//            Flash::addMessage('You are not allowed to access that resource.', Flash::WARNING);
+//            $response = new Response('', 302, ['Location' => '/']);
+//            $response->send();
+//            exit;
+//        }
+//    }
+
+
+
+
+    protected function requireAdmin(): void
+    {
+        $user = $this->auth->getUser();
+        if (!$user || !$user->is_admin) {
+            Flash::addMessage('You are not allowed to access that resource.', Flash::WARNING);
+            header('Location: /');
+            exit;
         }
     }
 
 
-    public function index(): Response {
+    public function index(): Response
+    {
+        $this->requireAdmin();
         $page = $_GET['page'] ?? 1;
-        list($users, $page, $total_pages) = $this->model->paginate((string) $page);
-
-        $content = $this->view->renderTemplate('Admin/Users/index.html', [
+        list($users, $currentPage, $totalPages) = $this->model->paginate((int)$page);
+        $this->view->renderTemplate('Admin/Users/index.html', [
             'users' => $users,
-            'page' => $page,
-            'total_pages' => $total_pages
+            'page' => $currentPage,
+            'total_pages' => $totalPages,
+        ]);
+        $output = ob_get_contents(); // Check if output is being generated
+        if (empty($output)) {
+            echo "No output generated";
+            exit;
+        }
+        return new Response();
+    }
+
+
+
+
+
+
+
+
+
+//    public function index(): Response
+//    {
+//        $page = $_GET['page'] ?? 1;
+//        list($users, $page, $total_pages) = $this->model->paginate((string) $page);
+//
+//        $content = $this->view->renderTemplate('Admin/Users/index.html', [
+//            'users' => $users,
+//            'page' => $page,
+//            'total_pages' => $total_pages
+//        ]);
+//
+//        return new Response($content);
+//    }
+
+    public function show($id): Response
+    {
+        $this->requireAdmin();
+        $user = $this->getUserOr404($id);
+        $content = $this->view->renderTemplate('Admin/Users/show.html', [
+            'user' => $user
         ]);
         return new Response($content);
     }
 
 
-    public function show(): Response {
-        $request = new Request(); // Assuming you have a Request class
-        $id = $request->post['id'];
-        $user = $this->getUserOr404($id);
-        $content = $this->view->renderTemplate('Admin/Users/show.html', [
-            'user' => $user
-        ]);
-        return new Response($content); 
-    }
-
-
-
-    public function edit(): Response
+    public function edit($id): Response
     {
-        $user = $this->getUserOr404($this->route_params['id']);
-
+        $this->requireAdmin();
+        $user = $this->getUserOr404($id);
         $content = $this->view->renderTemplate('Admin/Users/edit.html', [
             'user' => $user
         ]);
         return new Response($content);
     }
 
-    /**
-     * Update the user
-     *
-     * @return void
-     */
-    public function update() {
-        $user = $this->getUserOr404($this->route_params['id']);
-        $userData = $user->getData(); // assuming you have a getData method
-        if ($user->update($_POST)) {
-            Flash::addMessage('Changes saved', Flash::SUCCESS);
-            $this->redirect('/admin/users/' . $user->id . '/show');
-        } else {
-            $content = $this->view->renderTemplate('Admin/Users/edit.html', [
-                'user' => $userData
-            ]);
-            return new Response($content);
-        }
-    }
 
 
-    public function delete(): void
+
+
+
+
+
+
+    public function delete($id): void
     {
+        $this->requireAdmin();
+        error_log("Delete method called with ID: $id");
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $user = $this->getUserOr404($this->route_params['id']);
-            if ($this->auth->getUser()->id != $user->id) {
-                $user->delete();
+            $user = $this->getUserOr404($id);
+            $currentUser = $this->auth->getUser();
+            if ($currentUser && $currentUser->id != $user->id) {
+                error_log("Deleting user with ID: $id");
+                User::deleteByID($this->database, $id);
                 Flash::addMessage('User deleted', Flash::SUCCESS);
+            } else {
+                error_log("Cannot delete user with ID: $id");
+                Flash::addMessage('You cannot delete yourself or you are not logged in', Flash::WARNING);
             }
         }
-        $this->redirect('/admin/users/index');
+        header('Location: /admin/users/index');
+        exit;
     }
+
+
+
+
+
+
+
+
 
 
     public function new(): Response
     {
+        $this->requireAdmin();
         $content = $this->view->renderTemplate('Admin/Users/new.html');
         return new Response($content);
-
     }
 
 
-    public function create(): Response {
+
+    public function create(): Response
+    {
+        $this->requireAdmin();
         $user = $this->model;
-        if ($user->create($_POST)) {
+        if ($user->saveAdmin($_POST)) {
             Flash::addMessage('Changes saved', Flash::SUCCESS);
-            $this->redirect('/admin/users/' . $user->id . '/show');
+            return $this->redirect('/admin/users/' . $user->id . '/show');
         } else {
             Flash::addMessage('Changes not saved, please try again', Flash::WARNING);
             $content = $this->view->renderTemplate('Admin/Users/new.html', [
@@ -121,18 +177,37 @@ class Users extends \App\Controllers\Authenticated
     }
 
 
-
-    protected function getUserOr404($id): Response {
-        $user = $this->model->findByID($id);
-        if ($user) {
-            return new Response($this->view->renderTemplate('Admin/Users/show.html', ['user' => $user]));
+    public function update($id): Response
+    {
+        $this->requireAdmin();
+        $user = $this->getUserOr404($id);
+        if ($user->saveAdmin($_POST)) {
+            Flash::addMessage('Changes saved', Flash::SUCCESS);
+            return $this->redirect('/admin/users/' . $user->id . '/show');
         } else {
-            $content = $this->view->renderTemplate('404.html');
-            $response = new Response($content);
-            $response->setStatusCode(404);
-            return $response;
+            $content = $this->view->renderTemplate('Admin/Users/edit.html', [
+                'user' => $user
+            ]);
+            return new Response($content);
         }
     }
 
 
+
+
+
+    protected function getUserOr404($id)
+    {
+        $user = $this->model->findByID($id);
+
+        if (!$user) {
+            $content = $this->view->renderTemplate('404.html');
+            $response = new Response($content);
+            $response->setStatusCode(404);
+            $response->send();
+            exit;
+        }
+
+        return $user;
+        }
 }

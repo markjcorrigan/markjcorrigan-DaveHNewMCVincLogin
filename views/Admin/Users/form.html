@@ -2,36 +2,39 @@
     <label for="inputName">Name</label>
     <input id="inputName" name="name" placeholder="Name" {% if is_new %}autofocus{% endif %} value="{{ user.name }}" required class="form-control" />
 </div>
+
 <div class="form-group">
     <label for="inputEmail">Email address</label>
     <input type="email" id="inputEmail" name="email" placeholder="email address" value="{{ user.email }}" required class="form-control" />
 </div>
+
 <div class="form-group">
     <label for="inputPassword">Password</label>
     <input type="password" id="inputPassword" name="password" placeholder="Password" {% if is_new %}required{% else %}aria-describedby="helpBlock"{% endif %} class="form-control" />
     {% if not is_new %}<span id="helpBlock">Leave blank to keep current password</span>{% endif %}
 </div>
+
 <div class="checkbox">
     <label>
         {% if current_user.id == user.id %}
-            <input type="checkbox" checked="checked" disabled />
-            <input type="hidden" name="is_active" value="1" />
+        <input type="checkbox" checked="checked" disabled />
+        <input type="hidden" name="is_active" value="1" />
         {% else %}
-            <input type="checkbox" name="is_active" value="1" id="inputActive" {% if user.is_active %}checked="checked"{% endif %} />
+        <input type="checkbox" name="is_active" value="1" id="inputActive" {% if user.is_active %}checked="checked"{% endif %} />
         {% endif %}
-
         Active
     </label>
 </div>
+
 <div class="checkbox">
     <label>
         {% if current_user.id == user.id %}
-            <input type="checkbox" checked="checked" disabled />
-            <input type="hidden" name="is_admin" value="1" />
+        <input type="checkbox" checked="checked" disabled />
+        <input type="hidden" name="is_admin" value="1" />
         {% else %}
-            <input type="checkbox" name="is_admin" value="1" id="inputAdmin" {% if user.is_admin %}checked="checked"{% endif %} />
+        <input type="checkbox" name="is_admin" value="1" id="inputAdmin" {% if user.is_admin %}checked="checked"{% endif %} />
         {% endif %}
-
         Administrator
     </label>
 </div>
+

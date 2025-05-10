@@ -8,36 +8,16 @@ namespace Framework;
 class Paginator
 {
 
-    /**
-     * The total number of pages
-     * @var integer
-     */
-    protected int|float $total_pages;
+    protected float $total_pages;
 
-    /**
-     * The current page, filtered
-     * @var integer
-     */
+
     protected mixed $page;
 
-    /**
-     * The starting record (SQL OFFSET)
-     * @var integer
-     */
+
     protected int|float $offset;
 
-    /**
-     * Class constructor
-     *
-     * @param integer $total_records Total number of records
-     * @param integer $records_per_page Number of records on each page
-     * @param string $page Current page
-     *
-     * @return void
-     */
 
-//    public function __construct(int $total_records, int $records_per_page, string $page)
-    public function __construct(int $total_records, int $records_per_page, int|string $page)
+    public function __construct($total_records, $records_per_page, $page)
     {
         $this->total_pages = ceil($total_records / $records_per_page);
 
@@ -56,32 +36,19 @@ class Paginator
         $this->offset = $records_per_page * ($this->page - 1);
     }
 
-    /**
-     * Get the starting record (SQL OFFSET)
-     *
-     * @return integer
-     */
+
     public function getOffset(): float|int
     {
         return $this->offset;
     }
 
-    /**
-     * Get the current page
-     *
-     * @return integer
-     */
     public function getPage(): int
     {
         return $this->page;
     }
 
-    /**
-     * Get the total number of pages
-     *
-     * @return integer
-     */
-    public function getTotalPages(): float|int
+
+    public function getTotalPages(): float
     {
         return $this->total_pages;
     }

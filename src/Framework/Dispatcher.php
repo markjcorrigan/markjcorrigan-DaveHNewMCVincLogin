@@ -77,16 +77,37 @@ class Dispatcher
         return $middleware;
     }
 
-    private function getActionArguments(string $controller, string $action, array $params): array
-    {
+
+
+
+    private function getActionArguments(string $controller, string $action, array $params): array {
         $args = [];
         $method = new ReflectionMethod($controller, $action);
         foreach ($method->getParameters() as $parameter) {
             $name = $parameter->getName();
-            $args[] = $params[$name] ?? $params['route_params'][$name] ?? null;
+            if ($name === 'id' && isset($params['route_params']['id'])) {
+                $args[] = $params['route_params']['id'];
+            } else {
+                $args[] = $params[$name] ?? null;
+            }
         }
         return $args;
     }
+
+
+
+
+
+//    private function getActionArguments(string $controller, string $action, array $params): array
+//    {
+//        $args = [];
+//        $method = new ReflectionMethod($controller, $action);
+//        foreach ($method->getParameters() as $parameter) {
+//            $name = $parameter->getName();
+//            $args[] = $params[$name] ?? $params['route_params'][$name] ?? null;
+//        }
+//        return $args;
+//    }
 
 
 
