@@ -7,7 +7,7 @@ My key challenge was working with the static methods in the Registration and Log
 I am hoping Dave will find the time to look at my effort and hoping for him to provide an upgrade to his codebase for Registration and Login that works with the new MVC.
 I am currently busy adding the final touches to the profile section (which is working) and I am currently struggling with the Admin panel which was added on afterwards by Dave but was not included in his course.
 I love this framework as it is simple, based primarily on php and very powerful.  
-I still need to add in the javascript fine tuning for the pages but have struggled with this (due to jquery and validate being a front end solution and out of date) and for now, I would rather focus on the php validation which I believe is working.
+I still need to add in the javascript fine tuning for the pages but have struggled with this (due to jquery and validate being a front end solution is dated) and for now, I would rather focus on the php validation which I believe is working.
 Anyway, long story short, the code I have is working but I am sure that many fixes will be required to make it 100% compatible with the new MVC framework.
 
 Mark.
