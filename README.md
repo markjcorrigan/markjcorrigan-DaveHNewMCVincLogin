@@ -8,6 +8,7 @@ I am hoping Dave will find the time to look at my effort and hoping for him to p
 I am currently busy adding the final touches to the profile section (which is working) and I am currently struggling with the Admin panel which was added on afterwards by Dave but was not included in his course.
 I love this framework as it is simple, based primarily on php and very powerful.  
 I still need to add in the javascript fine tuning for the pages but have struggled with this (due to jquery and validate being a front end solution is dated) and for now, I would rather focus on the php validation which I believe is working.
+The sql for the 3 tables is included and the .env example explains where you need to add in credentials etc.  I use Mailgun for the email solution.
 Anyway, long story short, the code I have is working but I am sure that many fixes will be required to make it 100% compatible with the new MVC framework.
 
 Mark.
