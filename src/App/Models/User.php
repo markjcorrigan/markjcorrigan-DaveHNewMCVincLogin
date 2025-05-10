@@ -532,7 +532,7 @@ class User extends Model
     {
         $conn = $this->database->getConnection();
 
-        $total_records = (int)$conn->query('SELECT COUNT(id) FROM users')->fetchColumn();
+        $total_records = (int)$conn->query('SELECT COUNT(id) FROM user')->fetchColumn();
 
         $records_per_page = 5;
 

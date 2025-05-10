@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}User{% endblock %}
+
+{% block footer %}
+
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function() {
+
+            /**
+             * Get confirmation before submitting the delete form
+             */
+            $('#formDelete').submit(function() {
+                return confirm('Are you sure?');
+            });
+
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+
+    <nav>
+        <a href="/admin/users/index">« back to list of users</a>
+    </nav>
+
+    <h1>User</h1>
+    
+    <dl class="dl-horizontal">
+        <dt>Name</dt>
+        <dd>{{ user.name }}</dd>
+        <dt>email</dt>
+        <dd>{{ user.email }}</dd>
+        <dt>Active</dt>
+        <dd>{{ user.is_active ? 'yes' : 'no' }}</dd>
+        <dt>Administrator</dt>
+        <dd>{{ user.is_admin ? 'yes' : 'no' }}</dd>
+    </dl>
+
+    <a href="/admin/users/{{ user.id }}/edit" class="btn btn-default">Edit</a>
+
+    
+
+    <form method="post" action="/admin/users/{{ user.id }}/delete" id="formDelete">
+
+        <button type="submit"{% if current_user.id == user.id %} disabled{% endif %} class="btn btn-danger">Delete</button>
+
+    </form>
+
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}User{% endblock %}
+
+{% block footer %}
+
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="/js/hideShowPassword.min.js"></script>
+    <script src="/js/app.js"></script>
+
+    <script>
+        $(document).ready(function() {
+
+            var userId = '{{ user.id }}';
+
+            /**
+             * Validate the form
+             */
+            $('#formUser').validate({
+                rules: {
+                    name: 'required',
+                    email: {
+                        required: true,
+                        email: true,
+                        remote: {
+                            url: '/account/validate-email',
+                            data: {
+                                ignore_id: function() {
+                                    return userId;
+                                }
+                            }
+                        }
+                    },
+                    password: {
+                      minlength: 6,
+                      validPassword: true
+                    }
+                },
+                messages: {
+                    email: {
+                        remote: 'email already taken'
+                    }
+                }
+            });
+
+            /**
+             * Show password toggle button
+             */
+            $('#inputPassword').hideShowPassword({
+                show: false,
+                innerToggle: 'focus'
+            });
+
+        });
+    </script>
+
+{% endblock %}
+
+{% block body %}
+
+    <h1>Edit user</h1>
+
+    {% if user.errors is not empty %}
+        <p>Errors:</p>
+        <ul>
+            {% for error in user.errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post" action="/admin/users/{{ user.id }}/update" id="formUser">
+
+        {% include 'Admin/Users/form.html' with { is_new: false } %}
+
+        <button type="submit" class="btn btn-default">Save</button>
+        <a href="/admin/users/{{ user.id }}/show">Cancel</a>
+
+    </form>
+
+{% endblock %}

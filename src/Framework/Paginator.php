@@ -35,7 +35,9 @@ class Paginator
      *
      * @return void
      */
-    public function __construct(int $total_records, int $records_per_page, string $page)
+
+//    public function __construct(int $total_records, int $records_per_page, string $page)
+    public function __construct(int $total_records, int $records_per_page, int|string $page)
     {
         $this->total_pages = ceil($total_records / $records_per_page);
 
