@@ -7,7 +7,7 @@ The sql for the 3 tables is included in the repo and the ".env example" explains
 My code is working at this moment and I can register a new user and receive notification via my email as well as update my password if it is forgotten.
 My key challenge was working with the static methods in the Registration and Login course which I have converted to object methods using the constructor and dependency injection.  
 I am hoping Dave will find the time to look at my effort and hoping for him to provide an upgrade to his codebase for Registration and Login that works with the new MVC.
-I have added the final touches to the profile section (which is working) and I am working with the Admin interface (where user with is_admin = 1 in the mysql table can edit and update users in the system) which was added on afterwards by Dave but was not included in his course.  This, I believe, is working as well.
+I have added the final touches to the profile section (which is working) and I am working with the Admin interface (where user with is_admin = 1 in the mysql table can edit and update users in the system) which was added on afterwards by Dave but was not included in his course.  This, I believe, is working as well.  Now it is testing testing testing...
 
 I love this framework as it is simple, based primarily on php and is very powerful in its simplicity and ability to teach me php, oop and have an easy no hassle web framework that can be secured.   
 
