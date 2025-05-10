@@ -11,6 +11,6 @@ I have added the final touches to the profile section (which is working) and I a
 
 I love this framework as it is simple, based primarily on php and is very powerful in its simplicity and ability to teach me php, oop and have an easy no hassle web framework that can be secured.   
 
-Anyway, long story short, the code I have is working but I am sure that many fixes will be required to make it 100% compatible with the new MVC framework.
+Anyway, long story short, the code I have is working but I am sure that many fixes will be required to make it 100% compatible with the new MVC framework.  I.e. I may have gone off the reservation to get a solution that works that bypassed the truth and essence of the new MVC framework.  Any assistance to point out my shortcomings will be greatly appreciated.
 
 Mark.
