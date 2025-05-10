@@ -1,4 +1,4 @@
-Hi
+Hi.
 I set myself a challenge to convert Dave Hollingworth's Registration and Login course, created a while ago, tow work on his new MVC framework, released this year.
 I do not say that I have understood all the issues as his MVC course now deals with a number of new approaches + php v 8+ and declare(strict_types=1) etc.
 My code is working at this moment and I am hoping Dave will find the time to look at this or provide an upgrade to his codebase for Registration and Login that works with the new MVC.
