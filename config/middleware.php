@@ -3,5 +3,6 @@
 return [
     "message" => \App\Middleware\ChangeResponseExample::class,
     "trim" => \App\Middleware\ChangeRequestExample::class,
-    "deny" => \App\Middleware\RedirectExample::class
+    "deny" => \App\Middleware\RedirectExample::class,
+    "admin" => \App\Middleware\IsAdmin::class
 ];

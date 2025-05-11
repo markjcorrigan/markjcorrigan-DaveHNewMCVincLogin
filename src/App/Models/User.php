@@ -15,11 +15,7 @@ use Framework\Mail;
 use PDO;
 
 
-/**
- * User model
- *
- * PHP version 7.0
- */
+
 class User extends Model
 {
     public string $id;

@@ -38,7 +38,7 @@ class Products extends Controller
     {
         $product = $this->getProduct($id);
 
-        return $this->view("Products/edit.mvc.php", [
+        return $this->view("Products/edit.html", [
             "product" => $product
         ]);
     }
@@ -95,7 +95,7 @@ class Products extends Controller
 
         } else {
 
-            return $this->view("Products/edit.mvc.php", [
+            return $this->view("Products/edit.html", [
                 "errors" => $this->model->getErrors(),
                 "product" => $product
             ]);
