@@ -20,7 +20,7 @@ $router->add('search/delete/{id}', ['controller' => 'Search', 'action' => 'delet
 $router->add('search/edit/{id}', ['controller' => 'Search', 'action' => 'edit', 'method' => 'GET', "middleware" => "admin"]);
 $router->add('search/edit/{id}', ['controller' => 'Search', 'action' => 'edit', 'method' => 'POST', "middleware" => "admin"]);
 
-$router->add('search', ['controller' => 'Search', 'action' => 'index', 'method' => 'GET', "middleware" => "admin"]);
+$router->add('search', ['controller' => 'Search', 'action' => 'index', 'method' => 'GET']);
 
 
 
