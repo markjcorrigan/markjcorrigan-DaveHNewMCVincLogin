@@ -94,10 +94,6 @@ class Dispatcher
         return $args;
     }
 
-
-
-
-
 //    private function getActionArguments(string $controller, string $action, array $params): array
 //    {
 //        $args = [];
