@@ -33,7 +33,7 @@ I also believed I should use the new MVC middleware deny (or isadmin) but finall
             }
         }  
 ```
-Anyway.  Any assistance to point out my shortcomings and offer solutions will be greatly appreciated.
+Anyway.  Any assistance (updates to the code via pull requests or discussion) to point out my shortcomings and offer solutions will be greatly appreciated.
 
 Keep well.
 
