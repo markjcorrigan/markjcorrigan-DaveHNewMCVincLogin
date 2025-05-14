@@ -18,7 +18,7 @@ I also finished the Admin interface (where user with is_admin = 1 in the mysql t
 I have also added a search area where a user (or the admin) can put in page name's descriptions url's and keywords.  I.e. use this interface to map the web and search for content.  Middleware is used to protect the serach routes as you will see and only is_admin is true can use the routes that edit, delete the pages.
 These, I believe, are all working.  Now it is testing testing testing...
 
-I love this framework as it is simple, based primarily on pure php and is very powerful in its ability to teachphp, oop and is an easy no hassle web framework that can be quickly put into place and secured.   
+I love this framework as it is simple, based primarily on pure php and is very powerful in its ability to teach php (oop) and is an easy no hassle web framework that can be quickly put into place and secured.  With the container and dependency injection etc, using the framework as a web developer, we are all the better for it.
 
 Anyway, long story short, the code I have seems to be up and running.  However, I am sure that many fixes will be required to make it 100% compatible with the new MVC framework.  I.e. I may have gone off the reservation to get a solution that works that bypassed the truth and essence of the new MVC framework and approach that was envisaged by Dave. An example is the before() method in the Admin\Users.php controller.  I could not get this to work no matter what I did.
 I also believed I should use the new MVC middleware deny (or isadmin) but finally, with a heavy heart, resorted to:...  
