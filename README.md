@@ -1,6 +1,6 @@
 Hi.  About this work. FYI only.
 
-I set myself a challenge to convert Dave Hollingworth's Registration and Login course, created over a decade ago (but updated regularly), to work on his new MVC framework, released this year.
+I set myself a challenge to convert Dave Hollingworth's Registration and Login course, created over a decade ago (but updated regularly), to be able to work on his new MVC framework, released this year.
 I do not say that I have understood all the issues as Dave's MVC course now deals with a number of new approaches including an awesome router based on pattern matching and capture groups, a container, dependency injection, php v 8+, middlewares and declare(strict_types=1) etc.
 I still need to add in the javascript for the pages for front end validation but have struggled with this (due to jquery and validate being a front end solution which could be slightly outdated).  
 For now, I would rather focus on the php validation which I believe is working.
