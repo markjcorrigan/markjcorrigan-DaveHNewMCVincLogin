@@ -16,7 +16,6 @@ class RedirectExample implements MiddlewareInterface
     public function __construct(protected Auth $auth, private readonly Response $response)
     {
     }
-
     public function process(Request $request, RequestHandlerInterface $next): Response {
         $authorised = $this->auth->getUser();
         if (!$authorised) {

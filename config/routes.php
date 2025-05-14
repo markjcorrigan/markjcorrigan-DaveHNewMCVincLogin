@@ -9,11 +9,8 @@ $router->add("/admin/{controller}/{action}", ["namespace" => "Admin"]);
 //Admin
 $router->add('admin/{controller}/{id:\d+}/{action}', ['namespace' => 'Admin']);
 $router->add('admin/{controller}/{action}', ['namespace' => 'Admin']);
-//
-//
-//  search
-//
 
+//  search
 $router->add('search/add', ['controller' => 'Search', 'action' => 'add', 'method' => 'POST', "middleware" => "admin"]);
 $router->add('search/delete/{id}', ['controller' => 'Search', 'action' => 'delete', 'method' => 'POST', "middleware" => "admin"]);
 
@@ -21,20 +18,6 @@ $router->add('search/edit/{id}', ['controller' => 'Search', 'action' => 'edit', 
 $router->add('search/edit/{id}', ['controller' => 'Search', 'action' => 'edit', 'method' => 'POST', "middleware" => "admin"]);
 
 $router->add('search', ['controller' => 'Search', 'action' => 'index', 'method' => 'GET']);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 $router->add("/{title}/{id:\d+}/{page:\d+}", ["controller" => "products", "action" => "showPage"]);
 $router->add("/product/{slug:[\w-]+}", ["controller" => "products", "action" => "show"]);
@@ -60,20 +43,9 @@ $router->add('profile/edit', ['controller' => 'profile', 'action' => 'edit', "mi
 $router->add('items/index', ['controller' => 'items', 'action' => 'index', "middleware" => "deny"]);
 $router->add('items/{action:.*}', ['controller' => 'items', "middleware" => "deny"]);
 
-
-
-
 $router->add("/home/index", ["controller" => "home", "action" => "index"]);
 $router->add("/products", ["controller" => "products", "action" => "index"]);
 $router->add("/", ["controller" => "home", "action" => "index"]);
 $router->add("/{controller}/{action}");
-
-///testing
-//$router->add('signup', ['controller' => 'signup', 'action' => 'new']);
-//
-//$router->add('signup/activate/{token:[\da-f]+}', ['controller' => 'signup', 'action' => 'activate', 'token' => 'token']);
-
-
-
 
 return $router;

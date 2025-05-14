@@ -14,7 +14,7 @@ class Product extends Model
     protected function validate(array $data): void
     {
         if (empty($data["name"])) {
-            
+
             $this->addError("name", "Name is required");
 
         }
@@ -31,6 +31,6 @@ class Product extends Model
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return (int) $row["total"];
+        return (int)$row["total"];
     }
 }

@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Database;
 use Framework\Controller;
-use Framework\MVCTemplateViewer;
 use Framework\Response;
 use Framework\View;
 use Framework\Flash;
@@ -13,15 +12,14 @@ class Search extends Controller
 {
     public function __construct(
         protected readonly Database $database,
-        protected readonly View $view
-    ) {}
-
-
-
+        protected readonly View     $view
+    )
+    {
+    }
 
     public function index(): Response
     {
-        $page = (int) ($_GET['page'] ?? 1);
+        $page = (int)($_GET['page'] ?? 1);
         $term = $_GET['term'] ?? '';
         $searchModel = new \App\Models\Search($this->database);
         if (!empty($term)) {
@@ -39,18 +37,6 @@ class Search extends Controller
         ]);
         return new Response($content);
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     public function add(): Response
     {
@@ -84,8 +70,6 @@ class Search extends Controller
         $content = $this->view->renderTemplate('Search/edit.html', ['result' => $result]);
         return new Response($content);
     }
-
-
 
     public function delete($id): Response
     {

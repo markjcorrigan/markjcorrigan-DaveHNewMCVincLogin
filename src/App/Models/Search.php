@@ -3,7 +3,6 @@ namespace App\Models;
 
 use App\Database;
 use Framework\Model;
-use Framework\Paginator;
 use PDO;
 
 class Search extends Model
@@ -12,8 +11,6 @@ class Search extends Model
     {
         $this->database = $database;
     }
-
-
 
     public function getResults($term, $page = 1, $records_per_page = 10): array
     {
@@ -60,7 +57,6 @@ class Search extends Model
 
         return [$result, $page, $total_pages];
     }
-
 
     public function getResultById($id)
     {

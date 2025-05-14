@@ -14,7 +14,6 @@ use Framework\MiddlewareInterface;
 class IsAdmin implements MiddlewareInterface {
     public function __construct(protected Auth $auth, private readonly Response $response) {
     }
-
     public function process(Request $request, RequestHandlerInterface $next): Response {
         $user = $this->auth->getUser();
         if (!$user || !$user->is_admin) {

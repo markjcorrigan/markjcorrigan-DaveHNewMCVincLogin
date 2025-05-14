@@ -30,13 +30,15 @@ class Signup extends Controller
         return new Response($content);
 
     }
+
     public function new(): Response
     {
         $content = $this->view->renderTemplate('Signup/new.html');
         return new Response($content);
     }
 
-    public function create(): Response {
+    public function create(): Response
+    {
         if (!empty($_POST["firstname"])) {
             $this->redirect('/signup/success');
         } else {
@@ -56,16 +58,14 @@ class Signup extends Controller
     }
 
 
-    public function update(string $id): Response {
+    public function update(string $id): Response
+    {
         $user = $this->getUser($id);
 
         $name = $this->request->post["name"] ?? $user["name"];
         $email = $this->request->post["email"] ?? $user["email"];
         $newPassword = $this->request->post["new_password"] ?? '';
         $confirmNewPassword = $this->request->post["confirm_new_password"] ?? '';
-
-
-
         $validationData = [
             "name" => $name,
             "email" => $email,
@@ -109,10 +109,8 @@ class Signup extends Controller
         return new Response($content);
     }
 
-
-
-
-    public function success(): Response {
+    public function success(): Response
+    {
         if (isset($_SESSION['activation_hash'])) {
             $user = $this->findByActivationHash($_SESSION['activation_hash']);
 
@@ -125,8 +123,8 @@ class Signup extends Controller
         }
     }
 
-
-    public function findByActivationHash($activation_hash): ?User {
+    public function findByActivationHash($activation_hash): ?User
+    {
         $conn = $this->database->getConnection();
         $stmt = $conn->prepare('SELECT * FROM user WHERE activation_hash = :activation_hash');
         $stmt->bindParam(':activation_hash', $activation_hash);
@@ -145,8 +143,8 @@ class Signup extends Controller
         return null;
     }
 
-
-    public function activate(): Response {
+    public function activate(): Response
+    {
         $uri = $_SERVER['REQUEST_URI'];
         $parts = explode('/', $uri);
         $token = end($parts);
@@ -154,7 +152,6 @@ class Signup extends Controller
         Mail::send('markjc@mweb.co.za', 'A new signup', 'A new user just signed up', '<p>A new user just signed up</p>');
         return $this->redirect('/signup/activated');
     }
-
 
     public function activated(): Response
     {
@@ -175,7 +172,6 @@ class Signup extends Controller
 
     }
 
-
     private function getUser(string $id): array
     {
         $user = $this->model->find($id);
@@ -188,7 +184,6 @@ class Signup extends Controller
 
         return $user;
     }
-
 
     public function delete(string $id): Response
     {

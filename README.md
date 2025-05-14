@@ -33,8 +33,10 @@ I also believed I should use the new MVC middleware deny (or isadmin) but finall
             }
         }  
 ```
-Anyway.  Any assistance (updates to the code via pull requests or discussion) to point out my shortcomings and offer solutions will be greatly appreciated.
 
+A final note:  I have included many of the classes from the Register and Login course into the Framework folder.  The only change I have made to the Framework was a very small change in the Dispatcher class.  For that I apologise to Dave.  I could not figure out a way around it.
 Keep well.
+
+Anyway.  Any assistance (updates to the code via pull requests or discussion) to point out my shortcomings and offer solutions will be greatly appreciated.
 
 Mark.

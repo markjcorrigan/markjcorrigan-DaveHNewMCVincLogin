@@ -4,9 +4,6 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use Framework\Controller;
-use Framework\Exceptions\PageNotFoundException;
-use Framework\Flash;
-use Framework\MVCTemplateViewer;
 use Framework\Response;
 use Framework\View;
 use App\Models\User;
@@ -17,11 +14,6 @@ class Password extends Controller
     {
     }
 
-    /**
-     * Show the forgotten password page
-     *
-     * @return Response
-     */
     public function forgot(): Response
     {
         $content = $this->view->renderTemplate('Password/forgot.html');
@@ -47,7 +39,6 @@ class Password extends Controller
             return $result['error'];
         }
     }
-
 
     public function resetPassword(): Response
     {
@@ -78,6 +69,6 @@ class Password extends Controller
         } else {
             $content = $this->view->renderTemplate('Password/token_expired.html');
             return ['error' => new Response($content, 401)];
-            }
         }
+    }
 }

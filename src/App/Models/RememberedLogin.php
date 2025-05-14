@@ -15,14 +15,10 @@ class RememberedLogin extends Model
 
     protected Database $database;
 
-//    public function __construct(protected User $model)
-//    {
-//    }
     public function __construct(Database $database, protected User $model)
     {
         $this->database = $database;
     }
-
 
     public function findByToken(string $token): mixed
     {
@@ -44,18 +40,15 @@ class RememberedLogin extends Model
         }
     }
 
-
     public function getUser(): User
     {
         return $this->model->findByID($this->user_id);
     }
 
-
     public function hasExpired(): bool
     {
         return strtotime($this->expires_at) < time();
     }
-
 
     public function delete(string $id = null): bool
     {

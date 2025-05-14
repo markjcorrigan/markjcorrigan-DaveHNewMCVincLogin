@@ -8,7 +8,6 @@ use Framework\Controller;
 
 abstract class Authenticated extends Controller
 {
-
     protected function before(): void
     {
          $this->requireLogin();

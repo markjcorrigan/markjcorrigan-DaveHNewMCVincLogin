@@ -13,5 +13,4 @@
 
 <a href="/products/index">Click here for the products section</a><br>
 
-
 {% endblock %}

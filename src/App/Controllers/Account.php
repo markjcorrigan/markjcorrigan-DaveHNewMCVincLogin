@@ -3,25 +3,14 @@
 namespace App\Controllers;
 
 use \App\Models\User;
+use Framework\Controller;
 
-/**
- * Account controller
- *
- * PHP version 7.0
- */
-class Account extends \Core\Controller
+class Account extends Controller
 {
 
-    /**
-     * Validate if email is available (AJAX) for a new signup or an existing user.
-     * The ID of an existing user can be passed in in the querystring to ignore when
-     * checking if an email already exists or not.
-     *
-     * @return void
-     */
-    public function validateEmailAction()
+    public function validateEmailAction(): void
     {
-        $is_valid = ! User::emailExists($_GET['email'], $_GET['ignore_id'] ?? null);
+        $is_valid = ! User::emailExists($_GET['email'], $_GET['ignore_id'] ?? null);  //I still need to work on this
         
         header('Content-Type: application/json');
         echo json_encode($is_valid);

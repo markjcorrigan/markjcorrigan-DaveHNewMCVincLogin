@@ -6,7 +6,6 @@ namespace App\Controllers\Admin;
 
 use App\Database;
 use App\Models\User;
-use Framework\Request;
 use Framework\Response;
 use Framework\View;
 use Framework\Flash;
@@ -22,24 +21,6 @@ class Users extends \App\Controllers\Authenticated
         protected Auth $auth
     ) {
     }
-
-
-//    protected function before(): void
-//    {
-//        parent::before();
-//        error_log("Before method called");
-//        $user = $this->auth->getUser();
-//        error_log("User: " . print_r($user, true));
-//        if (!$user || !$user->is_admin) {
-//            error_log("User is not admin");
-//            Flash::addMessage('You are not allowed to access that resource.', Flash::WARNING);
-//            $response = new Response('', 302, ['Location' => '/']);
-//            $response->send();
-//            exit;
-//        }
-//    }
-
-
 
 
     protected function requireAdmin(): void

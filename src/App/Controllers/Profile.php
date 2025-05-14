@@ -9,18 +9,12 @@ use Framework\View;
 use Framework\Auth;
 use Framework\Flash;
 
-/**
- * Profile controller
- *
- * PHP version 7.0
- */
 class Profile extends Authenticated
 {
 
-    public function __construct(protected readonly Database $database, private readonly User $model, protected readonly View $view, protected Auth $auth) {
+    public function __construct(protected readonly Database $database, private readonly User $model, protected readonly View $view, protected Auth $auth)
+    {
     }
-
-
 
 //    protected function before(): void
 //    {
@@ -30,7 +24,8 @@ class Profile extends Authenticated
 //    }
 
 
-    public function show(): Response {
+    public function show(): Response
+    {
         $user = $this->auth->getUser();
         $content = $this->view->renderTemplate('Profile/show.html', [
             "user" => $user
@@ -38,14 +33,14 @@ class Profile extends Authenticated
         return new Response($content);
     }
 
-    public function edit(): Response {
+    public function edit(): Response
+    {
         $user = $this->auth->getUser();
         $content = $this->view->renderTemplate('Profile/edit.html', [
             "user" => $user
         ]);
         return new Response($content);
     }
-
 
     public function update(): Response
     {
@@ -62,23 +57,5 @@ class Profile extends Authenticated
             return new Response($content); // Return the Response object
         }
     }
-
-
-
-
-//    public function update() {
-//        $user = $this->auth->getUser();
-//        if ($user->updateProfile($_POST)) {
-//            Flash::addMessage('Changes saved');
-//            $this->redirect('/profile/show');
-//        } else {
-//            $content = $this->view->renderTemplate('Profile/edit.html', [
-//                "user" => $user
-//            ]);
-//            return new Response($content);
-//        }
-//    }
-
-
 }
 
